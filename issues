@@ -1,0 +1,31 @@
+Issues
+
+You will need to be able to input and output on STDIN/STDOUT and also
+files as necessary for the commands, but not for the ft_ssl itself.
+dispatcher buu-rp function pointers
+
+-s	string
+	     Print a checksum of the given string.
+
+     -p	     Echo stdin	to stdout and append the checksum to stdout. вывести на экран исходный текст
+
+     -q	     Quiet mode	-- only	the checksum is	printed	out.  Overrides	the -r
+	     option.
+
+     -r	     Reverses the format of the	output.	 This helps with visual	diffs.
+	     Does nothing when combined	with the -ptx options.
+
+       The md5, sha1, sha256, sha512, sha512t256 and rmd160 utilities exit 0 on
+     success, 1	if at least one	of the input files could not be	read, and 2 if
+     at	least one file does not	have the same hash as the -c option.
+
+     64-битовое представление b (размер исходного сообщения в битах) добавляется в
+     конец результата предыдущего этапа. В редких случаях, когда b больше 2^64, используются только младшие 64 бита значения b.
+     md5 -s "sdfdsf"
+     MD5 ("sdfdsf") = 20838a8df7cc0babd745c7af4b7d94e2
+-q -p and -r -p дают одинаковый другой результат, отличный от по отдельности
+предусмотреть наличие файла
+
+64 * (len / 64 + 1)
+./a.out md5 sfdsgsg
+(null): invalid option -- f
