@@ -29,3 +29,17 @@ dispatcher buu-rp function pointers
 64 * (len / 64 + 1)
 ./a.out md5 sfdsgsg
 (null): invalid option -- f
+нужно ли оставлять перевод строки как часть текста?
+
+MD5 uses big-endian convention at bit level, then little-endian convention at byte level.
+
+In this document a "word" is a 32-bit quantity and a "byte" is an
+   eight-bit quantity. A sequence of bits can be interpreted in a
+   natural manner as a sequence of bytes, where each consecutive group
+   of eight bits is interpreted as a byte with the high-order (most
+   significant) bit of each byte listed first. Similarly, a sequence of
+   bytes can be interpreted as a sequence of 32-bit words, where each
+   consecutive group of four bytes is interpreted as a word with the
+   low-order (least significant) byte given first.
+
+	 доделать функцию сдвига

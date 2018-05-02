@@ -21,9 +21,10 @@
 
 typedef struct		s_args
 {
+	int bytes_read;
 	char	*cipher;
 	unsigned char *md5_str;
-	unsigned char *md5_buf;
+	unsigned char md5_buf[64];
 	//int if_full;
 	//int desad_count;
   //unsigned char b64_buf[65];
@@ -46,10 +47,14 @@ typedef struct		s_addition
   int j;
   int k;
   int m;
-	unsigned char str1[4];
-	unsigned char str2[4];
-	unsigned char str3[4];
-	unsigned char str4[4];
+	unsigned char *str1;
+	unsigned char *str2;
+	unsigned char *str3;
+	unsigned char *str4;
+	unsigned char *str_a;
+	unsigned char *str_b;
+	unsigned char *str_c;
+	unsigned char *str_d;
 }					t_addition;
 
 void	*ft_memalloc(size_t size);
@@ -57,5 +62,22 @@ void	*ft_memcpy(void *dst, const void *src, size_t n);
 int		ft_strcmp(const char *s1, const char *s2);
 int		ft_printf(const char *format, ...);
 size_t		ft_strlen(const char *s);
+void clear_iterators(t_addition *iters);
+void	make_short_blocks_md5(t_args *params, int ret, unsigned char *str, t_addition *iters);
+int		find_symb(char *str, char flag, int len);
+void flags_normalize(char *all_flags, t_args *params, int len);
+int check_md5_and_sha256_flags(int argc, char **argv, t_args *params);
+int if_valid_args(int argc, char **argv, t_args *params);
+void clear_struct(t_args *params);
+void start_md5(t_args *params, t_addition *iters);
+void add_padding_md5(t_args *params, int len, int count);
+void	md5_reading(int fd, t_args *params, int len, t_addition *iters);
+void init_md5_vectors (t_addition *iters);
+
+void round1_func(t_args *params, t_addition *iters, int i);
+void round2_func(t_args *params, t_addition *iters, int i);
+void round3_func(t_args *params, t_addition *iters, int i);
+void round4_func(t_args *params, t_addition *iters, int i);
+void md5_cycle_shift(t_addition *iters, int count, int rounds);
 
 #endif
