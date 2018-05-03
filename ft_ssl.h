@@ -47,14 +47,23 @@ typedef struct		s_addition
   int j;
   int k;
   int m;
-	unsigned char *str1;
+	unsigned long a0;
+	unsigned long b0;
+	unsigned long c0;
+	unsigned long d0;
+	unsigned long a1;
+	unsigned long b1;
+	unsigned long c1;
+	unsigned long d1;
+	/*unsigned char *str1;
 	unsigned char *str2;
 	unsigned char *str3;
 	unsigned char *str4;
 	unsigned char *str_a;
 	unsigned char *str_b;
 	unsigned char *str_c;
-	unsigned char *str_d;
+	unsigned char *str_d;*/
+
 }					t_addition;
 
 void	*ft_memalloc(size_t size);

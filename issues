@@ -43,3 +43,10 @@ In this document a "word" is a 32-bit quantity and a "byte" is an
    low-order (least significant) byte given first.
 
 	 доделать функцию сдвига
+
+usage: md5 [-pqrtx] [-s string] [files ...] если нет строки после с
+выдает разный результат при одинаковых данных
+-р оригинал ждет ввода
+The original message is always padded with one bit "1" first.
+The length of the original message in bytes is converted to its binary format of 64 bits. If overflow happens, only the low-order 64 bits are used.
+не работает с нулевой строкой
