@@ -49,4 +49,23 @@ usage: md5 [-pqrtx] [-s string] [files ...] если нет строки пос�
 -р оригинал ждет ввода
 The original message is always padded with one bit "1" first.
 The length of the original message in bytes is converted to its binary format of 64 bits. If overflow happens, only the low-order 64 bits are used.
-не работает с нулевой строкой
+./a.out md5 "Hello world\!"
+(null): invalid option -- e
+сделать литл эндиан для вывода (для каждого слова)
+
+4294967296
+ 1101100011011000110010101001000
+01101100011011000110010101001000
+1001000 72
+1100101 101
+1101100 108
+108
+108
+1001
+72
+
+o Wo  01101111001000000101011101101111
+oW o
+01101111   o 111
+00100000 32 space
+01010111 87 w

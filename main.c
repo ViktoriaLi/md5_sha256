@@ -167,9 +167,9 @@ void clear_struct(t_args *params)
 
 void md5_cycle_shift(t_addition *iters, int count, int rounds)
 {
-	unsigned long int tmp;
+	unsigned long long tmp;
 	int bits[32];
-
+	//printf("111%d\n", (*iters).a0);
 	clear_iterators(iters);
 	if (rounds == 1)
 		tmp = (*iters).a0;
@@ -187,6 +187,7 @@ void md5_cycle_shift(t_addition *iters, int count, int rounds)
 		(*iters).i++;
 	}
 	tmp <<= count;
+	tmp %= 4294967296;
 	(*iters).i = 0;
 	(*iters).j = count - 1;
 	while ((*iters).j >= 0)
@@ -206,6 +207,7 @@ void md5_cycle_shift(t_addition *iters, int count, int rounds)
 		(*iters).c0 = tmp;
 	if (rounds == 4)
 		(*iters).d0 = tmp;
+		//printf("222%d\n", (*iters).a0);
 }
 
 void round1_func(t_args *params, t_addition *iters, int i)
@@ -214,7 +216,9 @@ void round1_func(t_args *params, t_addition *iters, int i)
 
 	clear_iterators(&count);
 
-	unsigned char tmp[4];
+	unsigned char tmp1[4];
+	unsigned long tmp;
+
 	const unsigned long table[16] = {0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
 		0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501, 0x698098d8, 0x8b44f7af,
 		0xffff5bb1, 0x895cd7be, 0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821};
@@ -222,41 +226,60 @@ void round1_func(t_args *params, t_addition *iters, int i)
 	count.k = i * 4;
 	while (count.j < 4)
 	{
-		tmp[count.j] = (*params).md5_buf[count.k];
+		tmp1[count.j] = (*params).md5_buf[count.k];
 		count.k++;
 		count.j++;
 	}
+	clear_iterators(&count);
+	count.m = 31;
+	count.k = 3;
+	while (count.m >= 0)
+  {
+    count.j = 7;
+    while (count.j >= 0)
+    {
+				if ((1 << count.j) & tmp1[count.k])
+	      	tmp |= (1 << count.m);
+				else
+					tmp &= ~(1 << count.m);
+			count.m--;
+      count.j--;
+    }
+    count.k--;
+  }
+	//printf("PLAINTEXT%s\n", tmp);
+	//printf("PLAINTEXT%lu\n", tmp);
 	if (i == 0 || i == 4 || i == 8 || i == 12)
 	{
 			(*iters).a0 = ((*iters).a0 +
-			(((*iters).b0 & (*iters).c0) | ((!(*iters).b0) & (*iters).d0))
-			+ (unsigned long int)(void *)tmp + table[i]);
+			(((*iters).b0 & (*iters).c0) | (~(*iters).b0 & (*iters).d0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 1);
-			(*iters).a0 += (*iters).b0;
+			(*iters).a0 = ((*iters).a0 + (*iters).b0) % 4294967296;
+			printf("1ROUND %lu\n", (*iters).a0);
 		}
 	else if (i == 1 || i == 5 || i == 9 || i == 13)
 	{
 			(*iters).d0 = ((*iters).d0 +
-			(((*iters).a0 & (*iters).b0) | ((!(*iters).a0) & (*iters).c0))
-			+ (unsigned long int)(void *)tmp + table[i]);
+			(((*iters).a0 & (*iters).b0) | (~(*iters).a0 & (*iters).c0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 4);
-			(*iters).d0 += (*iters).a0;
+			(*iters).d0 = ((*iters).d0 + (*iters).a0) % 4294967296;
+			printf("1ROUND %lu\n", (*iters).d0);
 	}
 	else if (i == 2 || i == 6 || i == 10 || i == 14)
 	{
-			(*iters).c0 =((*iters).c0 +
-			(((*iters).d0 & (*iters).a0) | ((!(*iters).d0) & (*iters).b0))
-			+ (unsigned long int)(void *)tmp + table[i]);
+			(*iters).c0 = ((*iters).c0 +
+			(((*iters).d0 & (*iters).a0) | (~(*iters).d0 & (*iters).b0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 3);
-			(*iters).c0 += (*iters).d0;
+			(*iters).c0 = ((*iters).c0 + (*iters).d0) % 4294967296;
+			printf("1ROUND %lu\n", (*iters).c0);
 	}
 	else if (i == 3 || i == 7 || i == 11 || i == 15)
 	{
 			(*iters).b0 = ((*iters).b0 +
-			(((*iters).c0 & (*iters).d0) | ((!(*iters).c0) & (*iters).a0))
-			+ (unsigned long int)(void *)tmp + table[i]);
+			(((*iters).c0 & (*iters).d0) | (~(*iters).c0 & (*iters).a0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 2);
-			(*iters).b0 = (*iters).c0;
+			(*iters).b0 = ((*iters).b0 + (*iters).c0) % 4294967296;
+			printf("1ROUND %lu\n", (*iters).b0);
 	}
 }
 
@@ -265,7 +288,8 @@ void round2_func(t_args *params, t_addition *iters, int i)
 	t_addition				count;
 
 	clear_iterators(&count);
-	unsigned char tmp[4];
+	unsigned char tmp1[4];
+	unsigned long tmp;
 	const unsigned long table[16] = {0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa, 0xd62f105d, 0x02441453,
 	0xd8a1e681, 0xe7d3fbc8, 0x21e1cde6, 0xc33707d6, 0xf4d50d87, 0x455a14ed,
 	0xa9e3e905, 0xfcefa3f8, 0x676f02d9, 0x8d2a4c8a};
@@ -274,41 +298,58 @@ void round2_func(t_args *params, t_addition *iters, int i)
 	count.k = index[i] * 4;
 	while (count.j < 4)
 	{
-		tmp[count.j] = (*params).md5_buf[count.k];
+		tmp1[count.j] = (*params).md5_buf[count.k];
 		count.k++;
 		count.j++;
+	}
+	clear_iterators(&count);
+	count.m = 31;
+	count.k = 3;
+	while (count.m >= 0)
+	{
+		count.j = 7;
+		while (count.j >= 0)
+		{
+				if ((1 << count.j) & tmp1[count.k])
+					tmp |= (1 << count.m);
+				else
+					tmp &= ~(1 << count.m);
+			count.m--;
+			count.j--;
+		}
+		count.k--;
 	}
 	if (i == 0 || i == 4 || i == 8 || i == 12)
 	{
 			(*iters).a0 = ((*iters).a0 +
-			(((*iters).b0 & (*iters).d0) | ((*iters).c0 & !(*iters).d0))
-			+ (unsigned long int)(void *)tmp + table[i]);
+			(((*iters).b0 & (*iters).d0) | ((*iters).c0 & ~(*iters).d0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 1);
-			(*iters).a0 += (*iters).b0;
+			(*iters).a0 = ((*iters).a0 + (*iters).b0) % 4294967296;
+			printf("2ROUND %lu\n", (*iters).a0);
 	}
 	else if (i == 1 || i == 5 || i == 9 || i == 13)
 	{
 			(*iters).d0 = ((*iters).d0 +
-			(((*iters).a0 & (*iters).c0) | ((*iters).b0 & !(*iters).c0))
-			+ (unsigned long int)(void *)tmp + table[i]);
+			(((*iters).a0 & (*iters).c0) | ((*iters).b0 & ~(*iters).c0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 4);
-			(*iters).d0 += (*iters).a0;
+			(*iters).d0 = ((*iters).d0 + (*iters).a0) % 4294967296;
+			printf("2ROUND %lu\n", (*iters).d0);
 	}
 	else if (i == 2 || i == 6 || i == 10 || i == 14)
 	{
-			(*iters).c0 =((*iters).c0 +
-			(((*iters).d0 & (*iters).b0) | ((*iters).a0 & !(*iters).b0))
-			+ (unsigned long int)(void *)tmp + table[i]);
+			(*iters).c0 = ((*iters).c0 +
+			(((*iters).d0 & (*iters).b0) | ((*iters).a0 & ~(*iters).b0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 3);
-			(*iters).c0 += (*iters).d0;
+			(*iters).c0 = ((*iters).c0 + (*iters).d0) % 4294967296;
+			printf("2ROUND %lu\n", (*iters).c0);
 	}
 	else if (i == 3 || i == 7 || i == 11 || i == 15)
 	{
 			(*iters).b0 = ((*iters).b0 +
-			(((*iters).c0 & (*iters).a0) | ((*iters).d0 & !(*iters).a0))
-			+ (unsigned long int)(void *)tmp + table[i]);
+			(((*iters).c0 & (*iters).a0) | ((*iters).d0 & ~(*iters).a0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 2);
-			(*iters).b0 = (*iters).c0;
+			(*iters).b0 = ((*iters).b0 + (*iters).c0) % 4294967296;
+			printf("2ROUND %lu\n", (*iters).b0);
 	}
 }
 
@@ -317,7 +358,8 @@ void round3_func(t_args *params, t_addition *iters, int i)
 	t_addition				count;
 
 	clear_iterators(&count);
-	unsigned char tmp[4];
+	unsigned long tmp;
+	unsigned char tmp1[4];
 	const unsigned long table[16] = {0xfffa3942, 0x8771f681,
 	0x6d9d6122, 0xfde5380c, 0xa4beea44, 0x4bdecfa9, 0xf6bb4b60, 0xbebfbc70,
 	0x289b7ec6, 0xeaa127fa, 0xd4ef3085, 0x04881d05, 0xd9d4d039, 0xe6db99e5,
@@ -327,41 +369,58 @@ void round3_func(t_args *params, t_addition *iters, int i)
 	count.k = index[i] * 4;
 	while (count.j < 4)
 	{
-		tmp[count.j] = (*params).md5_buf[count.k];
+		tmp1[count.j] = (*params).md5_buf[count.k];
 		count.k++;
 		count.j++;
+	}
+	clear_iterators(&count);
+	count.m = 31;
+	count.k = 3;
+	while (count.m >= 0)
+	{
+		count.j = 7;
+		while (count.j >= 0)
+		{
+				if ((1 << count.j) & tmp1[count.k])
+					tmp |= (1 << count.m);
+				else
+					tmp &= ~(1 << count.m);
+			count.m--;
+			count.j--;
+		}
+		count.k--;
 	}
 	if (i == 0 || i == 4 || i == 8 || i == 12)
 	{
 			(*iters).a0 = ((*iters).a0 +
-			((*iters).b0 ^ (*iters).c0 ^ (*iters).d0)
-			+ (unsigned long int)(void *)tmp + table[i]);
+			((*iters).b0 ^ (*iters).c0 ^ (*iters).d0) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 1);
-			(*iters).a0 += (*iters).b0;
+			(*iters).a0 = ((*iters).a0 + (*iters).b0) % 4294967296;
+			printf("3ROUND %lu\n", (*iters).a0);
 	}
 	else if (i == 1 || i == 5 || i == 9 || i == 13)
 	{
 			(*iters).d0 = ((*iters).d0 +
-			((*iters).a0 ^ (*iters).b0 ^ (*iters).c0)
-			+ (unsigned long int)(void *)tmp + table[i]);
+			((*iters).a0 ^ (*iters).b0 ^ (*iters).c0) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 4);
-			(*iters).d0 += (*iters).a0;
+			(*iters).d0 = ((*iters).d0 + (*iters).a0) % 4294967296;
+			printf("3ROUND %lu\n", (*iters).d0);
 	}
 	else if (i == 2 || i == 6 || i == 10 || i == 14)
 	{
-			(*iters).c0 =((*iters).c0 +
-			((*iters).d0 ^ (*iters).a0 ^ (*iters).b0)
-			+ (unsigned long int)(void *)tmp + table[i]);
+			(*iters).c0 = ((*iters).c0 +
+			((*iters).d0 ^ (*iters).a0 ^ (*iters).b0) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 3);
-			(*iters).c0 += (*iters).d0;
+			(*iters).c0 = ((*iters).c0 + (*iters).d0) % 4294967296;
+			printf("3ROUND %lu\n", (*iters).c0);
 	}
 	else if (i == 3 || i == 7 || i == 11 || i == 15)
 	{
 			(*iters).b0 = ((*iters).b0 +
-			((*iters).c0 ^ (*iters).d0 ^ (*iters).a0)
-			+ (unsigned long int)(void *)tmp + table[i]);
+			((*iters).c0 ^ (*iters).d0 ^ (*iters).a0) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 2);
-			(*iters).b0 = (*iters).c0;
+			(*iters).b0 = ((*iters).b0 + (*iters).c0) % 4294967296;
+			printf("3ROUND %lu\n", (*iters).b0);
 	}
 }
 
@@ -370,7 +429,8 @@ void round4_func(t_args *params, t_addition *iters, int i)
 	t_addition				count;
 
 	clear_iterators(&count);
-	unsigned char tmp[4];
+	unsigned long tmp;
+	unsigned char tmp1[4];
 	const unsigned long table[16] =  {0xf4292244, 0x432aff97, 0xab9423a7, 0xfc93a039,
 	0x655b59c3, 0x8f0ccc92, 0xffeff47d, 0x85845dd1, 0x6fa87e4f, 0xfe2ce6e0,
 	0xa3014314, 0x4e0811a1, 0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391};
@@ -379,41 +439,58 @@ void round4_func(t_args *params, t_addition *iters, int i)
 	count.k = index[i] * 4;
 	while (count.j < 4)
 	{
-		tmp[count.j] = (*params).md5_buf[count.k];
+		tmp1[count.j] = (*params).md5_buf[count.k];
 		count.k++;
 		count.j++;
+	}
+	clear_iterators(&count);
+	count.m = 31;
+	count.k = 3;
+	while (count.m >= 0)
+	{
+		count.j = 7;
+		while (count.j >= 0)
+		{
+				if ((1 << count.j) & tmp1[count.k])
+					tmp |= (1 << count.m);
+				else
+					tmp &= ~(1 << count.m);
+			count.m--;
+			count.j--;
+		}
+		count.k--;
 	}
 	if (i == 0 || i == 4 || i == 8 || i == 12)
 	{
 			(*iters).a0 = ((*iters).a0 +
-			((*iters).c0 ^ ((*iters).b0 | !(*iters).d0))
-			+ (unsigned long int)(void *)tmp + table[i]);
+			((*iters).c0 ^ ((*iters).b0 | ~(*iters).d0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 1);
-			(*iters).a0 += (*iters).b0;
+			(*iters).a0 = ((*iters).a0 + (*iters).b0) % 4294967296;
+			printf("4ROUND %lu\n", (*iters).a0);
 	}
 	else if (i == 1 || i == 5 || i == 9 || i == 13)
 	{
 			(*iters).d0 = ((*iters).d0 +
-			((*iters).b0 ^ ((*iters).a0 | !(*iters).c0))
-			+ (unsigned long int)(void *)tmp + table[i]);
+			((*iters).b0 ^ ((*iters).a0 | ~(*iters).c0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 4);
-			(*iters).d0 += (*iters).a0;
+			(*iters).d0 = ((*iters).d0 + (*iters).a0) % 4294967296;
+			printf("4ROUND %lu\n", (*iters).d0);
 	}
 	else if (i == 2 || i == 6 || i == 10 || i == 14)
 	{
-			(*iters).c0 =((*iters).c0 +
-			((*iters).a0 ^ ((*iters).d0 | !(*iters).b0))
-			+ (unsigned long int)(void *)tmp + table[i]);
+			(*iters).c0 = ((*iters).c0 +
+			((*iters).a0 ^ ((*iters).d0 | ~(*iters).b0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 3);
-			(*iters).c0 += (*iters).d0;
+			(*iters).c0 = ((*iters).c0 + (*iters).d0) % 4294967296;
+			printf("4ROUND %lu\n", (*iters).c0);
 	}
 	else if (i == 3 || i == 7 || i == 11 || i == 15)
 	{
 			(*iters).b0 = ((*iters).b0 +
-			((*iters).d0 ^ ((*iters).c0 | !(*iters).a0))
-			+ (unsigned long int)(void *)tmp + table[i]);
+			((*iters).d0 ^ ((*iters).c0 | ~(*iters).a0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 2);
-			(*iters).b0 = (*iters).c0;
+			(*iters).b0 = ((*iters).b0 + (*iters).c0) % 4294967296;
+			printf("4ROUND %lu\n", (*iters).b0);
 	}
 }
 
@@ -432,34 +509,34 @@ void start_md5(t_args *params, t_addition *iters)
 		while(i < 16)
 		{
 			round1_func(params, iters, i);
-			printf("1ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
+			//printf("1ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
 			i++;
 		}
 		i = 0;
 		while(i < 16)
 		{
 			round2_func(params, iters, i);
-			printf("2ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
+			//printf("2ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
 			i++;
 		}
 		i = 0;
 		while(i < 16)
 		{
 			round3_func(params, iters, i);
-			printf("3ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
+			//printf("3ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
 			i++;
 		}
 		i = 0;
 		while(i < 16)
 		{
 			round4_func(params, iters, i);
-			printf("4ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
+			//printf("4ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
 			i++;
 		}
-		(*iters).a0 += (*iters).a1;
-		(*iters).b0 += (*iters).b1;
-		(*iters).c0 += (*iters).c1;
-		(*iters).d0 += (*iters).d1;
+		(*iters).a0 = ((*iters).a0 + (*iters).a1) % 4294967296;
+		(*iters).b0 = ((*iters).b0 + (*iters).b1) % 4294967296;
+		(*iters).c0 = ((*iters).c0 + (*iters).c1) % 4294967296;
+		(*iters).d0 = ((*iters).d0 + (*iters).d1) % 4294967296;
 		printf("END %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
 		ft_printf("%x%x%x%x \n", (*iters).d0, (*iters).c0, (*iters).b0, (*iters).a0);
 }
