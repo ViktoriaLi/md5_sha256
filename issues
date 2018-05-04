@@ -42,8 +42,8 @@ In this document a "word" is a 32-bit quantity and a "byte" is an
    consecutive group of four bytes is interpreted as a word with the
    low-order (least significant) byte given first.
 
-	 доделать функцию сдвига
-
+16777215
+4294967295
 usage: md5 [-pqrtx] [-s string] [files ...] если нет строки после с
 выдает разный результат при одинаковых данных
 -р оригинал ждет ввода
@@ -69,3 +69,5 @@ oW o
 01101111   o 111
 00100000 32 space
 01010111 87 w
+
+ошибка на тексте pity those that aren't following baerista on spotify.

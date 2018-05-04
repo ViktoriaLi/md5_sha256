@@ -4,9 +4,8 @@ void md5_cycle_shift(unsigned long *a0, int count)
 {
   int i = 0;
   int j = 0;
-	unsigned long long tmp;
-  unsigned long
-   tmp1;
+	unsigned long tmp;
+  unsigned long tmp1;
 	int bits[32];
 	//printf("111%d\n", (*iters).a0);
 	tmp = *a0;
@@ -19,19 +18,20 @@ void md5_cycle_shift(unsigned long *a0, int count)
 		j--;
 		i++;
 	}
-  printf("TTT%llu\n", tmp);
+  printf("TTT%lu\n", tmp);
 	tmp <<= count;
   tmp1 = tmp % 4294967296;
-  printf("TTT%llu\n", tmp);
+  printf("TTT%lu\n", tmp);
 	i = 0;
 	j = count - 1;
+  printf ("JJJ%d\n", j);
 	while (j >= 0)
 	{
 		if (bits[i])
 	    tmp1 |= (1 << j);
 	  else
 	    tmp1 &= ~(1 << j);
-		bits[i]++;
+		i++;
 		j--;
 	}
 	*a0 = tmp1;
@@ -49,7 +49,21 @@ int main(void)
   printf("%lu\n", test);
   md5_cycle_shift(&test, 7);
   printf("%lu\n", test);*/
-  printf("%d\n", ' ');
+  unsigned long test = 2636577670;
+  //printf("%lx\n", (((test & 255) << 24) | ((test & 65535) << 8)) | (test >> 24));
+
+  //printf("%lx\n", (((((test & 255) << 24) | ((test & 65535) << 8)) | ((test) >> 16)) | (test & 255) << 8 /*| ((test & 4294967295) >> 24*/));
+  printf("%lx\n", ((test >> 24) | ((test >> 8) & 0x0000ff00) | ((test<<8) & 0x00ff0000) | (test<<24)));
+printf("%lx\n", ((test>>24)&255) | // move byte 3 to byte 0
+                    ((test<<8)&16711680) | // move byte 1 to byte 2
+                    ((test>>8)&65280) | // move byte 2 to byte 1
+                    ((test<<24)&4278190080) );
+
+    /*printf("%lx\n", (((test & 255) << 24)));
+      printf("%lx\n", (((test & 16777215) >> 16)));
+        printf("%lx\n", (((test & 16777215) >> 16)));
+          printf("%lx\n", (((test & 16777215) >> 16)));*/
+  //printf("%lx\n", (((test & 255) << 24) + (test >> 32)));
 }
 /*01000011110101110000100110111111
 0100001 1110101110000100110111111

@@ -167,7 +167,7 @@ void clear_struct(t_args *params)
 
 void md5_cycle_shift(t_addition *iters, int count, int rounds)
 {
-	unsigned long long tmp;
+	unsigned long tmp;
 	int bits[32];
 	//printf("111%d\n", (*iters).a0);
 	clear_iterators(iters);
@@ -196,7 +196,7 @@ void md5_cycle_shift(t_addition *iters, int count, int rounds)
 	    tmp |= (1 << (*iters).j);
 	  else
 	    tmp &= ~(1 << (*iters).j);
-		bits[(*iters).i]++;
+		(*iters).i++;
 		(*iters).j--;
 	}
 	if (rounds == 1)
@@ -249,13 +249,16 @@ void round1_func(t_args *params, t_addition *iters, int i)
   }
 	//printf("PLAINTEXT%s\n", tmp);
 	//printf("PLAINTEXT%lu\n", tmp);
+	//printf("FFF%lu\n", (((*iters).b0 & (*iters).c0) | (~(*iters).b0 & (*iters).d0)));
+
 	if (i == 0 || i == 4 || i == 8 || i == 12)
 	{
 			(*iters).a0 = ((*iters).a0 +
-			(((*iters).b0 & (*iters).c0) | (~(*iters).b0 & (*iters).d0)) + tmp + table[i]) % 4294967296;
+			(((*iters).b0 & (*iters).c0) | (~(*iters).b0 & (*iters).d0)) + tmp + table[i]);
 			md5_cycle_shift(iters, s[i], 1);
-			(*iters).a0 = ((*iters).a0 + (*iters).b0) % 4294967296;
-			printf("1ROUND %lu\n", (*iters).a0);
+			(*iters).a0 += (*iters).b0;
+			(*iters).a0 %= 4294967296;
+			//printf("1ROUND %lu\n", (*iters).a0);
 		}
 	else if (i == 1 || i == 5 || i == 9 || i == 13)
 	{
@@ -263,7 +266,7 @@ void round1_func(t_args *params, t_addition *iters, int i)
 			(((*iters).a0 & (*iters).b0) | (~(*iters).a0 & (*iters).c0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 4);
 			(*iters).d0 = ((*iters).d0 + (*iters).a0) % 4294967296;
-			printf("1ROUND %lu\n", (*iters).d0);
+			//printf("1ROUND %lu\n", (*iters).d0);
 	}
 	else if (i == 2 || i == 6 || i == 10 || i == 14)
 	{
@@ -271,7 +274,7 @@ void round1_func(t_args *params, t_addition *iters, int i)
 			(((*iters).d0 & (*iters).a0) | (~(*iters).d0 & (*iters).b0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 3);
 			(*iters).c0 = ((*iters).c0 + (*iters).d0) % 4294967296;
-			printf("1ROUND %lu\n", (*iters).c0);
+			//printf("1ROUND %lu\n", (*iters).c0);
 	}
 	else if (i == 3 || i == 7 || i == 11 || i == 15)
 	{
@@ -279,7 +282,7 @@ void round1_func(t_args *params, t_addition *iters, int i)
 			(((*iters).c0 & (*iters).d0) | (~(*iters).c0 & (*iters).a0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 2);
 			(*iters).b0 = ((*iters).b0 + (*iters).c0) % 4294967296;
-			printf("1ROUND %lu\n", (*iters).b0);
+			//printf("1ROUND %lu\n", (*iters).b0);
 	}
 }
 
@@ -325,7 +328,7 @@ void round2_func(t_args *params, t_addition *iters, int i)
 			(((*iters).b0 & (*iters).d0) | ((*iters).c0 & ~(*iters).d0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 1);
 			(*iters).a0 = ((*iters).a0 + (*iters).b0) % 4294967296;
-			printf("2ROUND %lu\n", (*iters).a0);
+			//printf("2ROUND %lu\n", (*iters).a0);
 	}
 	else if (i == 1 || i == 5 || i == 9 || i == 13)
 	{
@@ -333,7 +336,7 @@ void round2_func(t_args *params, t_addition *iters, int i)
 			(((*iters).a0 & (*iters).c0) | ((*iters).b0 & ~(*iters).c0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 4);
 			(*iters).d0 = ((*iters).d0 + (*iters).a0) % 4294967296;
-			printf("2ROUND %lu\n", (*iters).d0);
+			//printf("2ROUND %lu\n", (*iters).d0);
 	}
 	else if (i == 2 || i == 6 || i == 10 || i == 14)
 	{
@@ -341,7 +344,7 @@ void round2_func(t_args *params, t_addition *iters, int i)
 			(((*iters).d0 & (*iters).b0) | ((*iters).a0 & ~(*iters).b0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 3);
 			(*iters).c0 = ((*iters).c0 + (*iters).d0) % 4294967296;
-			printf("2ROUND %lu\n", (*iters).c0);
+			//printf("2ROUND %lu\n", (*iters).c0);
 	}
 	else if (i == 3 || i == 7 || i == 11 || i == 15)
 	{
@@ -349,7 +352,7 @@ void round2_func(t_args *params, t_addition *iters, int i)
 			(((*iters).c0 & (*iters).a0) | ((*iters).d0 & ~(*iters).a0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 2);
 			(*iters).b0 = ((*iters).b0 + (*iters).c0) % 4294967296;
-			printf("2ROUND %lu\n", (*iters).b0);
+			//printf("2ROUND %lu\n", (*iters).b0);
 	}
 }
 
@@ -396,7 +399,7 @@ void round3_func(t_args *params, t_addition *iters, int i)
 			((*iters).b0 ^ (*iters).c0 ^ (*iters).d0) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 1);
 			(*iters).a0 = ((*iters).a0 + (*iters).b0) % 4294967296;
-			printf("3ROUND %lu\n", (*iters).a0);
+			//printf("3ROUND %lu\n", (*iters).a0);
 	}
 	else if (i == 1 || i == 5 || i == 9 || i == 13)
 	{
@@ -404,7 +407,7 @@ void round3_func(t_args *params, t_addition *iters, int i)
 			((*iters).a0 ^ (*iters).b0 ^ (*iters).c0) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 4);
 			(*iters).d0 = ((*iters).d0 + (*iters).a0) % 4294967296;
-			printf("3ROUND %lu\n", (*iters).d0);
+			//printf("3ROUND %lu\n", (*iters).d0);
 	}
 	else if (i == 2 || i == 6 || i == 10 || i == 14)
 	{
@@ -412,7 +415,7 @@ void round3_func(t_args *params, t_addition *iters, int i)
 			((*iters).d0 ^ (*iters).a0 ^ (*iters).b0) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 3);
 			(*iters).c0 = ((*iters).c0 + (*iters).d0) % 4294967296;
-			printf("3ROUND %lu\n", (*iters).c0);
+			//printf("3ROUND %lu\n", (*iters).c0);
 	}
 	else if (i == 3 || i == 7 || i == 11 || i == 15)
 	{
@@ -420,7 +423,7 @@ void round3_func(t_args *params, t_addition *iters, int i)
 			((*iters).c0 ^ (*iters).d0 ^ (*iters).a0) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 2);
 			(*iters).b0 = ((*iters).b0 + (*iters).c0) % 4294967296;
-			printf("3ROUND %lu\n", (*iters).b0);
+			//printf("3ROUND %lu\n", (*iters).b0);
 	}
 }
 
@@ -466,7 +469,7 @@ void round4_func(t_args *params, t_addition *iters, int i)
 			((*iters).c0 ^ ((*iters).b0 | ~(*iters).d0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 1);
 			(*iters).a0 = ((*iters).a0 + (*iters).b0) % 4294967296;
-			printf("4ROUND %lu\n", (*iters).a0);
+			//printf("4ROUND %lu\n", (*iters).a0);
 	}
 	else if (i == 1 || i == 5 || i == 9 || i == 13)
 	{
@@ -474,7 +477,7 @@ void round4_func(t_args *params, t_addition *iters, int i)
 			((*iters).b0 ^ ((*iters).a0 | ~(*iters).c0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 4);
 			(*iters).d0 = ((*iters).d0 + (*iters).a0) % 4294967296;
-			printf("4ROUND %lu\n", (*iters).d0);
+			//printf("4ROUND %lu\n", (*iters).d0);
 	}
 	else if (i == 2 || i == 6 || i == 10 || i == 14)
 	{
@@ -482,7 +485,7 @@ void round4_func(t_args *params, t_addition *iters, int i)
 			((*iters).a0 ^ ((*iters).d0 | ~(*iters).b0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 3);
 			(*iters).c0 = ((*iters).c0 + (*iters).d0) % 4294967296;
-			printf("4ROUND %lu\n", (*iters).c0);
+			//printf("4ROUND %lu\n", (*iters).c0);
 	}
 	else if (i == 3 || i == 7 || i == 11 || i == 15)
 	{
@@ -490,7 +493,7 @@ void round4_func(t_args *params, t_addition *iters, int i)
 			((*iters).d0 ^ ((*iters).c0 | ~(*iters).a0)) + tmp + table[i]) % 4294967296;
 			md5_cycle_shift(iters, s[i], 2);
 			(*iters).b0 = ((*iters).b0 + (*iters).c0) % 4294967296;
-			printf("4ROUND %lu\n", (*iters).b0);
+			//printf("4ROUND %lu\n", (*iters).b0);
 	}
 }
 
@@ -504,7 +507,7 @@ void start_md5(t_args *params, t_addition *iters)
 		(*iters).b1 = (*iters).b0;
 		(*iters).c1 = (*iters).c0;
 		(*iters).d1 = (*iters).d0;
-		printf("START %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
+		//printf("START %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
 		i = 0;
 		while(i < 16)
 		{
@@ -537,8 +540,13 @@ void start_md5(t_args *params, t_addition *iters)
 		(*iters).b0 = ((*iters).b0 + (*iters).b1) % 4294967296;
 		(*iters).c0 = ((*iters).c0 + (*iters).c1) % 4294967296;
 		(*iters).d0 = ((*iters).d0 + (*iters).d1) % 4294967296;
-		printf("END %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
-		ft_printf("%x%x%x%x \n", (*iters).d0, (*iters).c0, (*iters).b0, (*iters).a0);
+		//printf("END %lu %lu %lu %lu \n", (*iters).d0, (*iters).c0, (*iters).b0, (*iters).a0);
+		//ft_printf("%x %x %x %x \n", (*iters).d0, (*iters).c0, (*iters).b0, (*iters).a0);
+		//ft_printf("%x %x %x %x \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
+		ft_printf("%lx", (((*iters).a0>>24)&255) | (((*iters).a0<<8)&16711680) | (((*iters).a0>>8)&65280) | (((*iters).a0<<24)&4278190080));
+		ft_printf("%lx", (((*iters).b0>>24)&255) | (((*iters).b0<<8)&16711680) | (((*iters).b0>>8)&65280) | (((*iters).b0<<24)&4278190080));
+		ft_printf("%lx", (((*iters).c0>>24)&255) | (((*iters).c0<<8)&16711680) | (((*iters).c0>>8)&65280) | (((*iters).c0<<24)&4278190080));
+		ft_printf("%lx", (((*iters).d0>>24)&255) | (((*iters).d0<<8)&16711680) | (((*iters).d0>>8)&65280) | (((*iters).d0<<24)&4278190080));
 }
 
 void add_padding_md5(t_args *params, int len, int count)
@@ -546,7 +554,7 @@ void add_padding_md5(t_args *params, int len, int count)
 	int i;
 
 	i = count;
-	printf("111%d\n", i);
+	//printf("111%d\n", i);
 	 (*params).md5_buf[count++] = 128;
   while (count < 56)
     (*params).md5_buf[count++] = 0;
@@ -554,9 +562,9 @@ void add_padding_md5(t_args *params, int len, int count)
   while (count < len)
     (*params).md5_buf[count++] = 0;
   //printf("%s\n", (*params).md5_buf);
-  count = 0;
+  /*count = 0;
   while (count < len)
-    printf("%d\n", (*params).md5_buf[count++]);
+    printf("%d\n", (*params).md5_buf[count++]);*/
 }
 
 void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
@@ -564,11 +572,11 @@ void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
 	clear_iterators(iters);
 	while (((*iters).k = read(0, &params->md5_buf, len)) > 0)
 	{
-		if ((*params).md5_buf[(*iters).k - 1] == '\n')
+		/*if ((*params).md5_buf[(*iters).k - 1] == '\n')
 		{
 			(*params).md5_buf[(*iters).k - 1] = 0;
 			(*iters).k--;
-		}
+		}*/
 		(*params).bytes_read += (*iters).k;
 		if ((*iters).k < len)
 			add_padding_md5(params, len, (*iters).k);
