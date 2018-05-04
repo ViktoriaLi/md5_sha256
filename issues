@@ -70,4 +70,15 @@ oW o
 00100000 32 space
 01010111 87 w
 
-ошибка на тексте pity those that aren't following baerista on spotify.
+ошибка на тексте pity those that aren't following baerista on spotify. - ошибка осталась после исправления переполнения
+разобраться с последними кейсами сабджекта с файлом и флагами
+сделать вывод перевода строки вконце
+
+108
+121
+10
+128
+
+128 10 121 108
+10000000 00001010 01111001 10000000
+echo "pickle rick" | ./a.out md5 -s segfault

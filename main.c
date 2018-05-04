@@ -24,9 +24,7 @@ void	make_short_blocks_md5(t_args *params, int ret, unsigned char *str, t_additi
 	{
 		j = 0;
 		while (i < ret && j < 64)
-		{
 			(*params).md5_buf[j++] = str[i++];
-		}
 		//printf("%d\n", j);
 		if (j < 64)
 			add_padding_md5(params, 64, j);
@@ -162,6 +160,7 @@ void clear_struct(t_args *params)
 	(*params).bytes_read = 0;
   (*params).cipher = NULL;
   (*params).md5_str = NULL;
+	(*params).md5_length = 0;
   //(*params).md5_buf = NULL;
 }
 
@@ -223,13 +222,19 @@ void round1_func(t_args *params, t_addition *iters, int i)
 		0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501, 0x698098d8, 0x8b44f7af,
 		0xffff5bb1, 0x895cd7be, 0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821};
 	const int s[16] = { 7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22 };
-	count.k = i * 4;
-	while (count.j < 4)
+	count.k = i * 4 + 3;
+	if (count.k == 59 && (*params).md5_buf[56] == 0)
+	tmp = (*params).md5_length;
+	else
+	tmp = (((((*params).md5_buf[count.k--] << 24) & 4294967295) + (((*params).md5_buf[count.k--] << 16) & 16777215)
++ (((*params).md5_buf[count.k--] << 8) & 65535) + ((*params).md5_buf[count.k] & 255)));
+	/*while (count.j < 4)
 	{
 		tmp1[count.j] = (*params).md5_buf[count.k];
 		count.k++;
 		count.j++;
 	}
+
 	clear_iterators(&count);
 	count.m = 31;
 	count.k = 3;
@@ -246,9 +251,8 @@ void round1_func(t_args *params, t_addition *iters, int i)
       count.j--;
     }
     count.k--;
-  }
-	//printf("PLAINTEXT%s\n", tmp);
-	//printf("PLAINTEXT%lu\n", tmp);
+  }*/
+	printf("PLAINTEXT%lu\n", tmp);
 	//printf("FFF%lu\n", (((*iters).b0 & (*iters).c0) | (~(*iters).b0 & (*iters).d0)));
 
 	if (i == 0 || i == 4 || i == 8 || i == 12)
@@ -298,8 +302,13 @@ void round2_func(t_args *params, t_addition *iters, int i)
 	0xa9e3e905, 0xfcefa3f8, 0x676f02d9, 0x8d2a4c8a};
 	const int s[16] = { 5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20 };
 	const int index[16] = {1, 6, 11, 0, 5, 10, 15, 4, 9, 14, 3, 8, 13, 2, 7, 12};
-	count.k = index[i] * 4;
-	while (count.j < 4)
+	count.k = index[i] * 4 + 3;
+	if (count.k == 59 && (*params).md5_buf[56] == 0)
+	tmp = (*params).md5_length;
+	else
+	tmp = (((((*params).md5_buf[count.k--] << 24) & 4294967295) + (((*params).md5_buf[count.k--] << 16) & 16777215)
++ (((*params).md5_buf[count.k--] << 8) & 65535) + ((*params).md5_buf[count.k] & 255)));
+	/*while (count.j < 4)
 	{
 		tmp1[count.j] = (*params).md5_buf[count.k];
 		count.k++;
@@ -321,7 +330,7 @@ void round2_func(t_args *params, t_addition *iters, int i)
 			count.j--;
 		}
 		count.k--;
-	}
+	}*/
 	if (i == 0 || i == 4 || i == 8 || i == 12)
 	{
 			(*iters).a0 = ((*iters).a0 +
@@ -369,8 +378,13 @@ void round3_func(t_args *params, t_addition *iters, int i)
 	0x1fa27cf8, 0xc4ac5665};
 	const int s[16] = { 4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23 };
 	const int index[16] = {5, 8, 11, 14, 1, 4, 7, 10, 13, 0, 3, 6, 9, 12, 15, 2};
-	count.k = index[i] * 4;
-	while (count.j < 4)
+	count.k = index[i] * 4 + 3;
+	if (count.k == 59 && (*params).md5_buf[56] == 0)
+	tmp = (*params).md5_length;
+	else
+	tmp = (((((*params).md5_buf[count.k--] << 24) & 4294967295) + (((*params).md5_buf[count.k--] << 16) & 16777215)
++ (((*params).md5_buf[count.k--] << 8) & 65535) + ((*params).md5_buf[count.k] & 255)));
+	/*while (count.j < 4)
 	{
 		tmp1[count.j] = (*params).md5_buf[count.k];
 		count.k++;
@@ -392,7 +406,7 @@ void round3_func(t_args *params, t_addition *iters, int i)
 			count.j--;
 		}
 		count.k--;
-	}
+	}*/
 	if (i == 0 || i == 4 || i == 8 || i == 12)
 	{
 			(*iters).a0 = ((*iters).a0 +
@@ -439,8 +453,14 @@ void round4_func(t_args *params, t_addition *iters, int i)
 	0xa3014314, 0x4e0811a1, 0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391};
 	const int s[16] = { 6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21 };
 	const int index[16] = {0, 7, 14, 5, 12, 3, 10, 1, 8, 15, 6, 13, 4, 11, 2, 9};
-	count.k = index[i] * 4;
-	while (count.j < 4)
+	count.k = index[i] * 4 + 3;
+	if (count.k == 59 && (*params).md5_buf[56] == 0)
+	tmp = (*params).md5_length;
+	else
+	tmp = (((((*params).md5_buf[count.k--] << 24) & 4294967295) + (((*params).md5_buf[count.k--] << 16) & 16777215)
++ (((*params).md5_buf[count.k--] << 8) & 65535) + ((*params).md5_buf[count.k] & 255)));
+
+	/*while (count.j < 4)
 	{
 		tmp1[count.j] = (*params).md5_buf[count.k];
 		count.k++;
@@ -462,7 +482,7 @@ void round4_func(t_args *params, t_addition *iters, int i)
 			count.j--;
 		}
 		count.k--;
-	}
+	}*/
 	if (i == 0 || i == 4 || i == 8 || i == 12)
 	{
 			(*iters).a0 = ((*iters).a0 +
@@ -512,28 +532,28 @@ void start_md5(t_args *params, t_addition *iters)
 		while(i < 16)
 		{
 			round1_func(params, iters, i);
-			//printf("1ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
+			printf("1ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
 			i++;
 		}
 		i = 0;
 		while(i < 16)
 		{
 			round2_func(params, iters, i);
-			//printf("2ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
+			printf("2ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
 			i++;
 		}
 		i = 0;
 		while(i < 16)
 		{
 			round3_func(params, iters, i);
-			//printf("3ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
+			printf("3ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
 			i++;
 		}
 		i = 0;
 		while(i < 16)
 		{
 			round4_func(params, iters, i);
-			//printf("4ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
+			printf("4ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
 			i++;
 		}
 		(*iters).a0 = ((*iters).a0 + (*iters).a1) % 4294967296;
@@ -554,17 +574,23 @@ void add_padding_md5(t_args *params, int len, int count)
 	int i;
 
 	i = count;
-	//printf("111%d\n", i);
 	 (*params).md5_buf[count++] = 128;
   while (count < 56)
     (*params).md5_buf[count++] = 0;
-  (*params).md5_buf[count++] = i * 8;
+
+	if ((i * 8) <= 255)
+  	(*params).md5_buf[count++] = i * 8;
+	else
+		{
+			(*params).md5_buf[count++] = 0;
+			(*params).md5_length = i * 8;
+		}
   while (count < len)
     (*params).md5_buf[count++] = 0;
-  //printf("%s\n", (*params).md5_buf);
-  /*count = 0;
+  printf("%s\n", (*params).md5_buf);
+  count = 0;
   while (count < len)
-    printf("%d\n", (*params).md5_buf[count++]);*/
+    printf("%d\n", (*params).md5_buf[count++]);
 }
 
 void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
@@ -572,11 +598,6 @@ void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
 	clear_iterators(iters);
 	while (((*iters).k = read(0, &params->md5_buf, len)) > 0)
 	{
-		/*if ((*params).md5_buf[(*iters).k - 1] == '\n')
-		{
-			(*params).md5_buf[(*iters).k - 1] = 0;
-			(*iters).k--;
-		}*/
 		(*params).bytes_read += (*iters).k;
 		if ((*iters).k < len)
 			add_padding_md5(params, len, (*iters).k);

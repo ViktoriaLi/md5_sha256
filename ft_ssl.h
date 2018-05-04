@@ -25,6 +25,8 @@ typedef struct		s_args
 	char	*cipher;
 	unsigned char *md5_str;
 	unsigned char md5_buf[64];
+	unsigned long plaintext_block[16];
+	unsigned long md5_length;
 	//int if_full;
 	//int desad_count;
   //unsigned char b64_buf[65];

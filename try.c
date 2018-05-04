@@ -53,12 +53,12 @@ int main(void)
   //printf("%lx\n", (((test & 255) << 24) | ((test & 65535) << 8)) | (test >> 24));
 
   //printf("%lx\n", (((((test & 255) << 24) | ((test & 65535) << 8)) | ((test) >> 16)) | (test & 255) << 8 /*| ((test & 4294967295) >> 24*/));
-  printf("%lx\n", ((test >> 24) | ((test >> 8) & 0x0000ff00) | ((test<<8) & 0x00ff0000) | (test<<24)));
+  /*printf("%lx\n", ((test >> 24) | ((test >> 8) & 0x0000ff00) | ((test<<8) & 0x00ff0000) | (test<<24)));
 printf("%lx\n", ((test>>24)&255) | // move byte 3 to byte 0
                     ((test<<8)&16711680) | // move byte 1 to byte 2
                     ((test>>8)&65280) | // move byte 2 to byte 1
-                    ((test<<24)&4278190080) );
-
+                    ((test<<24)&4278190080));*/
+  printf("%ld\n", ((((111 << 24) & 4294967295) + (('W' << 16) & 16777215) + ((' ' << 8) & 65535) + ('o' & 255))));
     /*printf("%lx\n", (((test & 255) << 24)));
       printf("%lx\n", (((test & 16777215) >> 16)));
         printf("%lx\n", (((test & 16777215) >> 16)));
