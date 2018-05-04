@@ -1,0 +1,25 @@
+echo "Without flags"
+echo "pickle rick" | md5
+echo "pickle rick" | ./a.out md5
+echo "Do not pity the dead, Harry." | md5
+echo "Do not pity the dead, Harry." | ./a.out md5
+echo "Pity the living." | md5
+echo "Pity the living." | ./a.out md5
+echo "And above all," | md5
+echo "And above all," | ./a.out md5
+echo "pity those that aren't following baerista on spotify." | md5
+echo "pity those that aren't following baerista on spotify." | ./a.out md5
+echo "be sure to handle edge cases carefully" | md5
+echo "be sure to handle edge cases carefully" | ./a.out md5
+echo "some of this will not make sense at first" | md5
+echo "some of this will not make sense at first" | ./a.out md5
+echo "but eventually you will understand" | md5
+echo "but eventually you will understand" | ./a.out md5
+echo "GL HF let's go" | md5
+echo "GL HF let's go" | ./a.out md5
+echo "one more thing" | md5
+echo "one more thing" | ./a.out md5
+echo "just to be extra clear" | md5
+echo "just to be extra clear" | ./a.out md5
+echo "Do not pity the dead, Harry." | md5 -p
+echo "Do not pity the dead, Harry." | ./a.out md5 -p

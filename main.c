@@ -20,6 +20,8 @@ void	make_short_blocks_md5(t_args *params, int ret, unsigned char *str, t_additi
 
 	i = 0;
 	j = 0;
+	if (find_symb((*params).flags, 'p', FLAG_LEN) >= 0)
+		ft_printf("%s\n", str);
 	while (i < ret)
 	{
 		j = 0;
@@ -27,17 +29,21 @@ void	make_short_blocks_md5(t_args *params, int ret, unsigned char *str, t_additi
 			(*params).md5_buf[j++] = str[i++];
 		//printf("%d\n", j);
 		if (j < 64)
-			add_padding_md5(params, 64, j);
+			add_padding_md5(params, 64, ret);
 		start_md5(params, iters);
 		j = 0;
 		while (j < 64)
 			(*params).md5_buf[j++] = 0;
 	}
-	if (ret == 0)
+	if (ret == 0 || ret % 64 == 0)
 	{
 		add_padding_md5(params, 64, 0);
 		start_md5(params, iters);
 	}
+	ft_printf("%lx", (((*iters).a0>>24)&255) | (((*iters).a0<<8)&16711680) | (((*iters).a0>>8)&65280) | (((*iters).a0<<24)&4278190080));
+	ft_printf("%lx", (((*iters).b0>>24)&255) | (((*iters).b0<<8)&16711680) | (((*iters).b0>>8)&65280) | (((*iters).b0<<24)&4278190080));
+	ft_printf("%lx", (((*iters).c0>>24)&255) | (((*iters).c0<<8)&16711680) | (((*iters).c0>>8)&65280) | (((*iters).c0<<24)&4278190080));
+	ft_printf("%lx\n", (((*iters).d0>>24)&255) | (((*iters).d0<<8)&16711680) | (((*iters).d0>>8)&65280) | (((*iters).d0<<24)&4278190080));
 }
 
 void clear_iterators(t_addition *iters)
@@ -224,35 +230,11 @@ void round1_func(t_args *params, t_addition *iters, int i)
 	const int s[16] = { 7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22 };
 	count.k = i * 4 + 3;
 	if (count.k == 59 && (*params).md5_buf[56] == 0)
-	tmp = (*params).md5_length;
+	tmp = (*params).bytes_read * 8;
 	else
 	tmp = (((((*params).md5_buf[count.k--] << 24) & 4294967295) + (((*params).md5_buf[count.k--] << 16) & 16777215)
 + (((*params).md5_buf[count.k--] << 8) & 65535) + ((*params).md5_buf[count.k] & 255)));
-	/*while (count.j < 4)
-	{
-		tmp1[count.j] = (*params).md5_buf[count.k];
-		count.k++;
-		count.j++;
-	}
-
-	clear_iterators(&count);
-	count.m = 31;
-	count.k = 3;
-	while (count.m >= 0)
-  {
-    count.j = 7;
-    while (count.j >= 0)
-    {
-				if ((1 << count.j) & tmp1[count.k])
-	      	tmp |= (1 << count.m);
-				else
-					tmp &= ~(1 << count.m);
-			count.m--;
-      count.j--;
-    }
-    count.k--;
-  }*/
-	printf("PLAINTEXT%lu\n", tmp);
+	//printf("PLAINTEXT%lu\n", tmp);
 	//printf("FFF%lu\n", (((*iters).b0 & (*iters).c0) | (~(*iters).b0 & (*iters).d0)));
 
 	if (i == 0 || i == 4 || i == 8 || i == 12)
@@ -304,7 +286,7 @@ void round2_func(t_args *params, t_addition *iters, int i)
 	const int index[16] = {1, 6, 11, 0, 5, 10, 15, 4, 9, 14, 3, 8, 13, 2, 7, 12};
 	count.k = index[i] * 4 + 3;
 	if (count.k == 59 && (*params).md5_buf[56] == 0)
-	tmp = (*params).md5_length;
+	tmp = (*params).bytes_read * 8;
 	else
 	tmp = (((((*params).md5_buf[count.k--] << 24) & 4294967295) + (((*params).md5_buf[count.k--] << 16) & 16777215)
 + (((*params).md5_buf[count.k--] << 8) & 65535) + ((*params).md5_buf[count.k] & 255)));
@@ -380,7 +362,7 @@ void round3_func(t_args *params, t_addition *iters, int i)
 	const int index[16] = {5, 8, 11, 14, 1, 4, 7, 10, 13, 0, 3, 6, 9, 12, 15, 2};
 	count.k = index[i] * 4 + 3;
 	if (count.k == 59 && (*params).md5_buf[56] == 0)
-	tmp = (*params).md5_length;
+	tmp = (*params).bytes_read * 8;
 	else
 	tmp = (((((*params).md5_buf[count.k--] << 24) & 4294967295) + (((*params).md5_buf[count.k--] << 16) & 16777215)
 + (((*params).md5_buf[count.k--] << 8) & 65535) + ((*params).md5_buf[count.k] & 255)));
@@ -455,34 +437,10 @@ void round4_func(t_args *params, t_addition *iters, int i)
 	const int index[16] = {0, 7, 14, 5, 12, 3, 10, 1, 8, 15, 6, 13, 4, 11, 2, 9};
 	count.k = index[i] * 4 + 3;
 	if (count.k == 59 && (*params).md5_buf[56] == 0)
-	tmp = (*params).md5_length;
+	tmp = (*params).bytes_read * 8;
 	else
 	tmp = (((((*params).md5_buf[count.k--] << 24) & 4294967295) + (((*params).md5_buf[count.k--] << 16) & 16777215)
 + (((*params).md5_buf[count.k--] << 8) & 65535) + ((*params).md5_buf[count.k] & 255)));
-
-	/*while (count.j < 4)
-	{
-		tmp1[count.j] = (*params).md5_buf[count.k];
-		count.k++;
-		count.j++;
-	}
-	clear_iterators(&count);
-	count.m = 31;
-	count.k = 3;
-	while (count.m >= 0)
-	{
-		count.j = 7;
-		while (count.j >= 0)
-		{
-				if ((1 << count.j) & tmp1[count.k])
-					tmp |= (1 << count.m);
-				else
-					tmp &= ~(1 << count.m);
-			count.m--;
-			count.j--;
-		}
-		count.k--;
-	}*/
 	if (i == 0 || i == 4 || i == 8 || i == 12)
 	{
 			(*iters).a0 = ((*iters).a0 +
@@ -532,41 +490,45 @@ void start_md5(t_args *params, t_addition *iters)
 		while(i < 16)
 		{
 			round1_func(params, iters, i);
-			printf("1ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
+			//printf("1ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
 			i++;
 		}
 		i = 0;
 		while(i < 16)
 		{
 			round2_func(params, iters, i);
-			printf("2ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
+			//printf("2ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
 			i++;
 		}
 		i = 0;
 		while(i < 16)
 		{
 			round3_func(params, iters, i);
-			printf("3ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
+			//printf("3ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
 			i++;
 		}
 		i = 0;
 		while(i < 16)
 		{
 			round4_func(params, iters, i);
-			printf("4ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
+			//printf("4ROUND %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
 			i++;
 		}
 		(*iters).a0 = ((*iters).a0 + (*iters).a1) % 4294967296;
 		(*iters).b0 = ((*iters).b0 + (*iters).b1) % 4294967296;
 		(*iters).c0 = ((*iters).c0 + (*iters).c1) % 4294967296;
 		(*iters).d0 = ((*iters).d0 + (*iters).d1) % 4294967296;
+		/*(*iters).a0 = (((*iters).a0>>24)&255) | (((*iters).a0<<8)&16711680) | (((*iters).a0>>8)&65280) | (((*iters).a0<<24)&4278190080);
+		(*iters).b0 = (((*iters).b0>>24)&255) | (((*iters).b0<<8)&16711680) | (((*iters).b0>>8)&65280) | (((*iters).b0<<24)&4278190080);
+		(*iters).c0 = (((*iters).c0>>24)&255) | (((*iters).c0<<8)&16711680) | (((*iters).c0>>8)&65280) | (((*iters).c0<<24)&4278190080);
+		(*iters).d0 = (((*iters).d0>>24)&255) | (((*iters).d0<<8)&16711680) | (((*iters).d0>>8)&65280) | (((*iters).d0<<24)&4278190080);*/
 		//printf("END %lu %lu %lu %lu \n", (*iters).d0, (*iters).c0, (*iters).b0, (*iters).a0);
 		//ft_printf("%x %x %x %x \n", (*iters).d0, (*iters).c0, (*iters).b0, (*iters).a0);
 		//ft_printf("%x %x %x %x \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
-		ft_printf("%lx", (((*iters).a0>>24)&255) | (((*iters).a0<<8)&16711680) | (((*iters).a0>>8)&65280) | (((*iters).a0<<24)&4278190080));
+		/*ft_printf("%lx", (((*iters).a0>>24)&255) | (((*iters).a0<<8)&16711680) | (((*iters).a0>>8)&65280) | (((*iters).a0<<24)&4278190080));
 		ft_printf("%lx", (((*iters).b0>>24)&255) | (((*iters).b0<<8)&16711680) | (((*iters).b0>>8)&65280) | (((*iters).b0<<24)&4278190080));
 		ft_printf("%lx", (((*iters).c0>>24)&255) | (((*iters).c0<<8)&16711680) | (((*iters).c0>>8)&65280) | (((*iters).c0<<24)&4278190080));
-		ft_printf("%lx", (((*iters).d0>>24)&255) | (((*iters).d0<<8)&16711680) | (((*iters).d0>>8)&65280) | (((*iters).d0<<24)&4278190080));
+		ft_printf("%lx\n", (((*iters).d0>>24)&255) | (((*iters).d0<<8)&16711680) | (((*iters).d0>>8)&65280) | (((*iters).d0<<24)&4278190080));*/
 }
 
 void add_padding_md5(t_args *params, int len, int count)
@@ -587,10 +549,10 @@ void add_padding_md5(t_args *params, int len, int count)
 		}
   while (count < len)
     (*params).md5_buf[count++] = 0;
-  printf("%s\n", (*params).md5_buf);
+  /*printf("%s\n", (*params).md5_buf);
   count = 0;
   while (count < len)
-    printf("%d\n", (*params).md5_buf[count++]);
+    printf("%d\n", (*params).md5_buf[count++]);*/
 }
 
 void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
@@ -600,9 +562,18 @@ void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
 	{
 		(*params).bytes_read += (*iters).k;
 		if ((*iters).k < len)
-			add_padding_md5(params, len, (*iters).k);
+			add_padding_md5(params, len, (*params).bytes_read);
 		start_md5(params, iters);
 	}
+	if ((*iters).k == 0 && (*params).bytes_read % 64 == 0)
+	{
+		add_padding_md5(params, len, (*params).bytes_read);
+		start_md5(params, iters);
+	}
+	ft_printf("%lx", (((*iters).a0>>24)&255) | (((*iters).a0<<8)&16711680) | (((*iters).a0>>8)&65280) | (((*iters).a0<<24)&4278190080));
+	ft_printf("%lx", (((*iters).b0>>24)&255) | (((*iters).b0<<8)&16711680) | (((*iters).b0>>8)&65280) | (((*iters).b0<<24)&4278190080));
+	ft_printf("%lx", (((*iters).c0>>24)&255) | (((*iters).c0<<8)&16711680) | (((*iters).c0>>8)&65280) | (((*iters).c0<<24)&4278190080));
+	ft_printf("%lx\n", (((*iters).d0>>24)&255) | (((*iters).d0<<8)&16711680) | (((*iters).d0>>8)&65280) | (((*iters).d0<<24)&4278190080));
 }
 
 void init_md5_vectors (t_addition *iters)
