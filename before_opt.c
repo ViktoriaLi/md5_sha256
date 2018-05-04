@@ -13,47 +13,37 @@
 #include "ft_ssl.h"
 #include <stdio.h>
 
-void print_md5_result(t_addition *iters, t_args *params)
-{
-	if (find_symb((*params).flags, 's', FLAG_LEN) >= 0 && find_symb((*params).flags, 'p', FLAG_LEN) >= 0)
-		ft_printf("%s\n", (*params).md5_str);
-	else if (find_symb((*params).flags, 's', FLAG_LEN) >= 0)
-			ft_printf("MD5 (\"%s\") ", (*params).md5_str);
-	ft_printf("%lx", (((*iters).a0>>24)&255) | (((*iters).a0<<8)&16711680) | (((*iters).a0>>8)&65280) | (((*iters).a0<<24)&4278190080));
-	ft_printf("%lx", (((*iters).b0>>24)&255) | (((*iters).b0<<8)&16711680) | (((*iters).b0>>8)&65280) | (((*iters).b0<<24)&4278190080));
-	ft_printf("%lx", (((*iters).c0>>24)&255) | (((*iters).c0<<8)&16711680) | (((*iters).c0>>8)&65280) | (((*iters).c0<<24)&4278190080));
-	ft_printf("%lx", (((*iters).d0>>24)&255) | (((*iters).d0<<8)&16711680) | (((*iters).d0>>8)&65280) | (((*iters).d0<<24)&4278190080));
-	if ((*params).ifd > 0 && find_symb((*params).flags, 'r', FLAG_LEN) >= 0)
-		ft_printf(" %s\n", (*params).filename);
-	else
-		ft_printf("%c", '\n');
-}
-
 void	make_short_blocks_md5(t_args *params, int ret, unsigned char *str, t_addition *iters)
 {
-	t_addition				count;
+	int i;
+	int j;
 
-	clear_iterators(&count);
-	while (count.i < ret)
+	i = 0;
+	j = 0;
+	if (find_symb((*params).flags, 'p', FLAG_LEN) >= 0)
+		ft_printf("%s\n", str);
+	while (i < ret)
 	{
-		count.j = 0;
-		while (count.i < ret && count.j < 64)
-			(*params).md5_buf[count.j++] = str[count.i++];
+		j = 0;
+		while (i < ret && j < 64)
+			(*params).md5_buf[j++] = str[i++];
 		//printf("%d\n", j);
-		if (count.j < 64)
+		if (j < 64)
 			add_padding_md5(params, 64, ret);
 		start_md5(params, iters);
-		count.j = 0;
-		while (count.j < 64)
-			(*params).md5_buf[count.j++] = 0;
+		j = 0;
+		while (j < 64)
+			(*params).md5_buf[j++] = 0;
 	}
 	if (ret == 0 || ret % 64 == 0)
 	{
 		add_padding_md5(params, 64, 0);
 		start_md5(params, iters);
 	}
-	print_md5_result(iters, params);
-	init_md5_vectors(iters);
+	ft_printf("%lx", (((*iters).a0>>24)&255) | (((*iters).a0<<8)&16711680) | (((*iters).a0>>8)&65280) | (((*iters).a0<<24)&4278190080));
+	ft_printf("%lx", (((*iters).b0>>24)&255) | (((*iters).b0<<8)&16711680) | (((*iters).b0>>8)&65280) | (((*iters).b0<<24)&4278190080));
+	ft_printf("%lx", (((*iters).c0>>24)&255) | (((*iters).c0<<8)&16711680) | (((*iters).c0>>8)&65280) | (((*iters).c0<<24)&4278190080));
+	ft_printf("%lx\n", (((*iters).d0>>24)&255) | (((*iters).d0<<8)&16711680) | (((*iters).d0>>8)&65280) | (((*iters).d0<<24)&4278190080));
 }
 
 void clear_iterators(t_addition *iters)
@@ -116,34 +106,22 @@ int check_md5_and_sha256_flags(int argc, char **argv, t_args *params)
     ft_strcmp(argv[i], "-r") == 0 || ft_strcmp(argv[i], "-s") == 0)
     {
       all_flags[j] = argv[i][1];
-      if (argv[i][1] == 's' && argv[i + 1])
+      if (argv[i][1] == 's')
       {
         //printf("%s\n", argv[i + 1]);
         (*params).md5_str = (unsigned char *)argv[i + 1];
         i++;
       }
-			else if (argv[i][1] == 's')
-			{
-				ft_printf("%s\n", "usage: md5 [-pqr] [-s string] [files ...]");
-				return (1);
-			}
       j++;
       i++;
     }
     else if (((*params).ifd = open(argv[i], O_RDONLY)) > 0)
-		{
-			(*params).filename = argv[i];
-			break;
-		}
-		else
-		{
-			ft_printf("md5: %s: No such file or directory\n", argv[i]);
-			return (1);
-		}
+				break;
+			
 			/*{
 				while (i < argc)
  			 {
- 				 ft_printf("md5: %s %s\n", argv[i], "No such file or directory");
+ 				 ft_printf("ft_ssl md5: %s %s\n", argv[i], "No such file or directory");
  				 i++;
  			 }
 			 break;
@@ -151,7 +129,7 @@ int check_md5_and_sha256_flags(int argc, char **argv, t_args *params)
 			/*printf("%s\n", argv[i]);
 			printf("%d\n", (*params).ifd);*/
 
-    //}
+    }
   }
   flags_normalize(all_flags, params, argc - 1);
   //printf("DDD%d\n", find_flag(params, 'i'));
@@ -200,7 +178,6 @@ void clear_struct(t_args *params)
   (*params).cipher = NULL;
   (*params).md5_str = NULL;
 	(*params).md5_length = 0;
-	(*params).filename = NULL;
   //(*params).md5_buf = NULL;
 }
 
@@ -546,13 +523,11 @@ void add_padding_md5(t_args *params, int len, int count)
 void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
 {
 	clear_iterators(iters);
-	while (((*iters).k = read(fd, &params->md5_buf, len)) > 0)
+	while (((*iters).k = read(0, &params->md5_buf, len)) > 0)
 	{
 		(*params).bytes_read += (*iters).k;
-		/*if (find_symb((*params).flags, 'p', FLAG_LEN) >= 0)
+		if (find_symb((*params).flags, 'p', FLAG_LEN) >= 0)
 			ft_printf("%s", (*params).md5_buf);
-		else if (fd > 0 && find_symb((*params).flags, 'r', FLAG_LEN) < 0)
-			ft_printf("MD5 (%s) = ", (*params).filename);*/
 		if ((*iters).k < len)
 			add_padding_md5(params, len, (*params).bytes_read);
 		start_md5(params, iters);
@@ -562,8 +537,10 @@ void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
 		add_padding_md5(params, len, (*params).bytes_read);
 		start_md5(params, iters);
 	}
-	print_md5_result(iters, params);
-	init_md5_vectors(iters);
+	ft_printf("%lx", (((*iters).a0>>24)&255) | (((*iters).a0<<8)&16711680) | (((*iters).a0>>8)&65280) | (((*iters).a0<<24)&4278190080));
+	ft_printf("%lx", (((*iters).b0>>24)&255) | (((*iters).b0<<8)&16711680) | (((*iters).b0>>8)&65280) | (((*iters).b0<<24)&4278190080));
+	ft_printf("%lx", (((*iters).c0>>24)&255) | (((*iters).c0<<8)&16711680) | (((*iters).c0>>8)&65280) | (((*iters).c0<<24)&4278190080));
+	ft_printf("%lx\n", (((*iters).d0>>24)&255) | (((*iters).d0<<8)&16711680) | (((*iters).d0>>8)&65280) | (((*iters).d0<<24)&4278190080));
 }
 
 void init_md5_vectors (t_addition *iters)
@@ -589,29 +566,16 @@ int main (int argc, char **argv)
   if (!if_valid_args(argc, argv, &params))
     return (0);
 	init_md5_vectors(&iters);
-	if (ft_strcmp(params.cipher, "md5") == 0 && params.ifd > 1)
-	{
-		printf("LETEST%s\n", "LETEST");
-		md5_reading(params.ifd, &params, 64, &iters);
-		/*print_md5_result(&iters, &params);
-		init_md5_vectors(&iters);*/
-	}
   if (ft_strcmp(params.cipher, "md5") == 0 && find_symb(params.flags, 's', FLAG_LEN) < 0)
-	{
-		md5_reading(0, &params, 64, &iters);
-		/*print_md5_result(&iters, &params);
-		init_md5_vectors(&iters);*/
-	}
+    md5_reading(0, &params, 64, &iters);
 	if (ft_strcmp(params.cipher, "md5") == 0 && find_symb(params.flags, 's', FLAG_LEN) >= 0)
 	{
 		params.bytes_read = ft_strlen((char *)params.md5_str);
 		//printf("LE%d\n", params.bytes_read);
 		make_short_blocks_md5(&params, params.bytes_read, params.md5_str, &iters);
-		/*print_md5_result(&iters, &params);
-		init_md5_vectors(&iters);*/
 	}
-
-
+	if (ft_strcmp(params.cipher, "md5") == 0 && params.ifd > 0)
+		md5_reading(params.ifd, &params, 64, &iters);
   /*else if (((ft_strcmp(params.cipher, "des") == 0) || (ft_strcmp(params.cipher, "des-ecb") == 0)
 || (ft_strcmp(params.cipher, "des-cbc") == 0)) && (find_symb(params.flags, 'd', FLAG_LEN) < 0)
 && (find_symb(params.flags, 'i', FLAG_LEN)) < 0)
@@ -628,8 +592,8 @@ int main (int argc, char **argv)
   || (ft_strcmp(params.cipher, "des-cbc") == 0)) && (find_symb(params.flags, 'd', FLAG_LEN) >= 0)
 && (find_symb(params.flags, 'i', FLAG_LEN)) >= 0)
     des_reading(params.ifd, &params, 64);*/
-  if (params.ifd > 1)
+  /*if (params.ifd > 1)
     close(params.ifd);
-  /*if (params.ofd > 1)
+  if (params.ofd > 1)
     close(params.ofd);*/
 }

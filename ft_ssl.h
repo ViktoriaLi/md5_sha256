@@ -23,6 +23,7 @@ typedef struct		s_args
 {
 	int bytes_read;
 	char	*cipher;
+	char	*filename;
 	unsigned char *md5_str;
 	unsigned char md5_buf[64];
 	unsigned long plaintext_block[16];
@@ -33,7 +34,7 @@ typedef struct		s_args
   //unsigned char buf[DES_BLOCK];
   //unsigned char *vector16;
 	char flags[FLAG_LEN];
-	//int ifd;
+	int ifd;
 	//int ofd;
 	//unsigned char *des_key;
 	//unsigned char key_res48[6];
