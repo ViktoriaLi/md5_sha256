@@ -54,10 +54,18 @@ typedef struct		s_addition
 	unsigned long b0;
 	unsigned long c0;
 	unsigned long d0;
+	unsigned long e0;
+	unsigned long f0;
+	unsigned long g0;
+	unsigned long h0;
 	unsigned long a1;
 	unsigned long b1;
 	unsigned long c1;
 	unsigned long d1;
+	unsigned long e1;
+	unsigned long f1;
+	unsigned long g1;
+	unsigned long h1;
 	/*unsigned char *str1;
 	unsigned char *str2;
 	unsigned char *str3;
@@ -68,6 +76,29 @@ typedef struct		s_addition
 	unsigned char *str_d;*/
 
 }					t_addition;
+
+
+typedef struct		s_sha256
+{
+	unsigned int eps0;
+	unsigned int eps1;
+	unsigned int ma;
+	unsigned int ch;
+	unsigned int t1;
+	unsigned int t2;
+	unsigned int s0;
+	unsigned int s1;
+	/*unsigned char *str1;
+	unsigned char *str2;
+	unsigned char *str3;
+	unsigned char *str4;
+	unsigned char *str_a;
+	unsigned char *str_b;
+	unsigned char *str_c;
+	unsigned char *str_d;*/
+
+}					t_sha256;
+
 
 void	*ft_memalloc(size_t size);
 void	*ft_memcpy(void *dst, const void *src, size_t n);
@@ -91,5 +122,7 @@ void round2_func(t_args *params, t_addition *iters, int i);
 void round3_func(t_args *params, t_addition *iters, int i);
 void round4_func(t_args *params, t_addition *iters, int i);
 void md5_cycle_shift(t_addition *iters, int count, int rounds);
+
+void init_sha256_vectors (t_addition *iters);
 
 #endif
