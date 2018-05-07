@@ -124,5 +124,6 @@ void round4_func(t_args *params, t_addition *iters, int i);
 void md5_cycle_shift(t_addition *iters, int count, int rounds);
 
 void init_sha256_vectors (t_addition *iters);
+void start_sha256(t_args *params, t_addition *iters, int iflast);
 
 #endif
