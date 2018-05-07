@@ -25,7 +25,7 @@ typedef struct		s_args
 	char	*cipher;
 	char	*filename;
 	unsigned char *md5_str;
-	unsigned char md5_buf[64];
+	unsigned char md5_buf[128];
 	unsigned long plaintext_block[16];
 	unsigned long md5_length;
 	//int if_full;
@@ -66,17 +66,48 @@ typedef struct		s_addition
 	unsigned long f1;
 	unsigned long g1;
 	unsigned long h1;
-	/*unsigned char *str1;
-	unsigned char *str2;
-	unsigned char *str3;
-	unsigned char *str4;
-	unsigned char *str_a;
-	unsigned char *str_b;
-	unsigned char *str_c;
-	unsigned char *str_d;*/
+	unsigned long long aa0;
+	unsigned long long bb0;
+	unsigned long long cc0;
+	unsigned long long dd0;
+	unsigned long long ee0;
+	unsigned long long ff0;
+	unsigned long long gg0;
+	unsigned long long hh0;
+	unsigned long long aa1;
+	unsigned long long bb1;
+	unsigned long long cc1;
+	unsigned long long dd1;
+	unsigned long long ee1;
+	unsigned long long ff1;
+	unsigned long long gg1;
+	unsigned long long hh1;
 
 }					t_addition;
 
+/*typedef struct		s_sha512
+{
+  int i;
+  int j;
+  int k;
+  int m;
+	unsigned long long a0;
+	unsigned long long b0;
+	unsigned long long c0;
+	unsigned long long d0;
+	unsigned long long e0;
+	unsigned long long f0;
+	unsigned long long g0;
+	unsigned long long h0;
+	unsigned long long a1;
+	unsigned long long b1;
+	unsigned long long c1;
+	unsigned long long d1;
+	unsigned long long e1;
+	unsigned long long f1;
+	unsigned long long g1;
+	unsigned long long h1;
+}					t_sha512;*/
 
 typedef struct		s_sha256
 {
@@ -88,16 +119,22 @@ typedef struct		s_sha256
 	unsigned int t2;
 	unsigned int s0;
 	unsigned int s1;
-	/*unsigned char *str1;
-	unsigned char *str2;
-	unsigned char *str3;
-	unsigned char *str4;
-	unsigned char *str_a;
-	unsigned char *str_b;
-	unsigned char *str_c;
-	unsigned char *str_d;*/
 
 }					t_sha256;
+
+typedef struct		s_sha512_vars
+{
+	unsigned long long eps0;
+	unsigned long long  eps1;
+	unsigned long long  ma;
+	unsigned long long  ch;
+	unsigned long long  t1;
+	unsigned long long  t2;
+	unsigned long long  s0;
+	unsigned long long  s1;
+
+
+}					t_sha512_vars;
 
 
 void	*ft_memalloc(size_t size);
@@ -125,5 +162,7 @@ void md5_cycle_shift(t_addition *iters, int count, int rounds);
 
 void init_sha256_vectors (t_addition *iters);
 void start_sha256(t_args *params, t_addition *iters, int iflast);
+void start_sha512(t_args *params, t_addition *iters, int iflast);
+void init_sha512_vectors (t_addition *iters);
 
 #endif

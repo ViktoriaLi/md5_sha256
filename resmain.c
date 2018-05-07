@@ -34,34 +34,27 @@ void	make_short_blocks_md5(t_args *params, int ret, unsigned char *str, t_additi
 	t_addition				count;
 
 	clear_iterators(&count);
-	int len;
-	if (ft_strcmp((*params).cipher, "sha512") == 0 )
-		len = 128;
-	else
-		len = 64;
 	while (count.i < ret)
 	{
 		count.j = 0;
-		while (count.i < ret && count.j < len)
+		while (count.i < ret && count.j < 64)
 			(*params).md5_buf[count.j++] = str[count.i++];
 		//printf("%d\n", j);
-		if (count.j < len)
-			add_padding_md5(params, len, ret);
+		if (count.j < 64)
+			add_padding_md5(params, 64, ret);
 		if (ft_strcmp((*params).cipher, "md5") == 0)
 			start_md5(params, iters);
 		if (ft_strcmp((*params).cipher, "sha256") == 0)
 			start_sha256(params, iters, 1);
-		if (ft_strcmp((*params).cipher, "sha512") == 0)
-			start_sha512(params, iters, 1);
 		count.j = 0;
-		while (count.j < len)
+		while (count.j < 64)
 			(*params).md5_buf[count.j++] = 0;
 	}
 	if (ft_strcmp((*params).cipher, "md5") == 0)
 	{
-		if (ret == 0 || ret % len == 0)
+		if (ret == 0 || ret % 64 == 0)
 		{
-			add_padding_md5(params, len, 0);
+			add_padding_md5(params, 64, 0);
 			start_md5(params, iters);
 		}
 		print_md5_result(iters, params);
@@ -69,29 +62,15 @@ void	make_short_blocks_md5(t_args *params, int ret, unsigned char *str, t_additi
 	}
 	if (ft_strcmp((*params).cipher, "sha256") == 0)
 	{
-		if (ret == 0 || ret % len == 0)
+		if (ret == 0 || ret * 8 == 448)
 		{
-			add_padding_md5(params, len, 0);
+			add_padding_md5(params, 64, 0);
 			start_sha256(params, iters, 0);
 		}
 		ft_printf("%x%x%x%x%x%x%x%x\n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0, (*iters).e0, (*iters).f0,
 		(*iters).f0, (*iters).h0);
 		init_sha256_vectors(iters);
 	}
-	if (ft_strcmp((*params).cipher, "sha512") == 0)
-	{
-		if (ret == 0 || ret % len == 0)
-		{
-			add_padding_md5(params, len, 0);
-			start_sha512(params, iters, 0);
-		}
-		ft_printf("%llx%llx%llx%llx%llx%llx%llx%llx\n", (*iters).aa0, (*iters).bb0, (*iters).cc0, (*iters).dd0, (*iters).ee0, (*iters).ff0,
-		(*iters).gg0, (*iters).hh0);
-		init_sha256_vectors(iters);
-	}
-	count.j = 0;
-	while (count.j < len)
-		(*params).md5_buf[count.j++] = 0;
 }
 
 void clear_iterators(t_addition *iters)
@@ -213,7 +192,7 @@ int if_valid_args(int argc, char **argv, t_args *params)
     ft_printf("%s\n", "usage: ft_ssl command [command opts] [command args]");
     return (0);
   }
-  if (ft_strcmp(argv[1], "md5") != 0 && ft_strcmp(argv[1], "sha256") != 0 && ft_strcmp(argv[1], "sha512") != 0)
+  if (ft_strcmp(argv[1], "md5") != 0 && ft_strcmp(argv[1], "sha256") != 0)
   {
     ft_printf("ft_ssl: Error: %s is an invalid command.\n\n", argv[1]);
     ft_printf("%s\n", "Standard commands:\n\nMessage Digest commands:");
@@ -222,7 +201,7 @@ int if_valid_args(int argc, char **argv, t_args *params)
   }
   if ((ft_strcmp(argv[1], "md5") == 0) && (res = check_md5_and_sha256_flags(argc, argv, params)) > 0)
     return (0);
-  else if ((ft_strcmp(argv[1], "sha256") == 0 || ft_strcmp(argv[1], "sha512") == 0)&& (res = check_md5_and_sha256_flags(argc, argv, params)) > 0)
+  else if ((ft_strcmp(argv[1], "sha256") == 0)&& (res = check_md5_and_sha256_flags(argc, argv, params)) > 0)
     return (0);
   (*params).cipher = argv[1];
   return (1);
@@ -239,38 +218,6 @@ void clear_struct(t_args *params)
   (*params).md5_str = NULL;
 	(*params).filename = NULL;
   //(*params).md5_buf = NULL;
-}
-
-unsigned long long sha512_cycle_shift(unsigned long long nbr, int count)
-{
-	t_addition				iters;
-	unsigned long long tmp;
-	unsigned long long bits[32];
-	//printf("111%d\n", (*iters).a0);
-	clear_iterators(&iters);
-
-		tmp = nbr;
-	while (iters.i < count)
-	{
-		bits[iters.i] = (1 << iters.j) & tmp;
-		iters.j++;
-		iters.i++;
-	}
-	tmp >>= count;
-	//tmp %= 4294967296;
-	iters.i = 0;
-	iters.j = 64 - count;
-	while (iters.i < count)
-	{
-		if (bits[iters.i])
-	    tmp |= (1 << iters.j);
-	  else
-	    tmp &= ~(1 << iters.j);
-		iters.i++;
-		iters.j++;
-	}
-	return (tmp);
-		//printf("222%d\n", (*iters).a0);
 }
 
 unsigned int sha256_cycle_shift(unsigned int nbr, int count)
@@ -564,112 +511,6 @@ void round4_func(t_args *params, t_addition *iters, int i)
 	}
 }
 
-void start_sha512(t_args *params, t_addition *iters, int iflast)
-{
-	t_addition				count;
-	t_sha512_vars				add_vars;
-	unsigned long tmp1;
-	unsigned long tmp2;
-	const unsigned long long square[80] = {0x428a2f98d728ae22, 0x7137449123ef65cd,
-		0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc,
-0x3956c25bf348b538, 0x59f111f1b605d019, 0x923f82a4af194f9b, 0xab1c5ed5da6d8118,
-0xd807aa98a3030242, 0x12835b0145706fbe, 0x243185be4ee4b28c, 0x550c7dc3d5ffb4e2,
-0x72be5d74f27b896f, 0x80deb1fe3b1696b1, 0x9bdc06a725c71235, 0xc19bf174cf692694,
-0xe49b69c19ef14ad2, 0xefbe4786384f25e3, 0x0fc19dc68b8cd5b5, 0x240ca1cc77ac9c65,
-0x2de92c6f592b0275, 0x4a7484aa6ea6e483, 0x5cb0a9dcbd41fbd4, 0x76f988da831153b5,
-0x983e5152ee66dfab, 0xa831c66d2db43210, 0xb00327c898fb213f, 0xbf597fc7beef0ee4,
-0xc6e00bf33da88fc2, 0xd5a79147930aa725, 0x06ca6351e003826f, 0x142929670a0e6e70,
-0x27b70a8546d22ffc, 0x2e1b21385c26c926, 0x4d2c6dfc5ac42aed, 0x53380d139d95b3df,
-0x650a73548baf63de, 0x766a0abb3c77b2a8, 0x81c2c92e47edaee6, 0x92722c851482353b,
-0xa2bfe8a14cf10364, 0xa81a664bbc423001, 0xc24b8b70d0f89791, 0xc76c51a30654be30,
-0xd192e819d6ef5218, 0xd69906245565a910, 0xf40e35855771202a, 0x106aa07032bbd1b8,
-0x19a4c116b8d2d0c8, 0x1e376c085141ab53, 0x2748774cdf8eeb99, 0x34b0bcb5e19b48a8,
-0x391c0cb3c5c95a63, 0x4ed8aa4ae3418acb, 0x5b9cca4f7763e373, 0x682e6ff3d6b2b8a3,
-0x748f82ee5defb2fc, 0x78a5636f43172f60, 0x84c87814a1f0ab72, 0x8cc702081a6439ec,
-0x90befffa23631e28, 0xa4506cebde82bde9, 0xbef9a3f7b2c67915, 0xc67178f2e372532b,
-0xca273eceea26619c, 0xd186b8c721c0c207, 0xeada7dd6cde0eb1e, 0xf57d4f7fee6ed178,
-0x06f067aa72176fba, 0x0a637dc5a2c898a6, 0x113f9804bef90dae, 0x1b710b35131c471b,
-0x28db77f523047d84, 0x32caab7b40c72493, 0x3c9ebe0a15c9bebc, 0x431d67c49c100d4c,
-0x4cc5d4becb3e42b6, 0x597f299cfc657e2a, 0x5fcb6fab3ad6faec, 0x6c44198c4a475817};
-
-   unsigned long long words[64];
-		clear_iterators(&count);
-
-	while (count.i < 16)
-	{
-		tmp1 = (((((*params).md5_buf[count.k++] << 24) & 4294967295) +
-			(((*params).md5_buf[count.k++] << 16) & 16777215)
-+ (((*params).md5_buf[count.k++] << 8) & 65535) + ((*params).md5_buf[count.k++] & 255)));
-	tmp2 =
-(((((*params).md5_buf[count.k++] << 24) & 4294967295) +
-	(((*params).md5_buf[count.k++] << 16) & 16777215)
-+ (((*params).md5_buf[count.k++] << 8) & 65535) + ((*params).md5_buf[count.k++] & 255)));
-		words[count.i] = (tmp1 << 32) + tmp2;
-		printf("%llu\n", words[count.i]);
-		count.i++;
-	}
-	if ((*params).md5_buf[127] == 0)
-	words[15] = (*params).bytes_read * 8;
-	printf("%llu\n", words[15]);
-	while (count.i < 80)
-	{
-		add_vars.s0 = sha512_cycle_shift(words[count.i-15], 1) ^ sha512_cycle_shift(words[count.i-15], 8)
-		^ (words[count.i-15] >> 7);
-add_vars.s1 = sha512_cycle_shift(words[count.i-2], 19) ^ sha512_cycle_shift(words[count.i-2], 61) ^ (words[count.i-2] >> 6);
-		words[count.i] = words[count.i-16] + add_vars.s0 + words[count.i-7] + add_vars.s1;
-		count.i++;
-	}
-	printf("%llu\n", words[15]);
-	printf("START%llx %llx %llx %llx %llx %llx %llx %llx \n", (*iters).aa0, (*iters).bb0, (*iters).cc0, (*iters).dd0, (*iters).ee0,
-	(*iters).ff0, (*iters).gg0, (*iters).hh0);
-	(*iters).aa1 = (*iters).aa0;
-	(*iters).bb1 = (*iters).bb0;
-	(*iters).cc1 = (*iters).cc0;
-	(*iters).dd1 = (*iters).dd0;
-	(*iters).ee1 = (*iters).ee0;
-	(*iters).ff1 = (*iters).ff0;
-	(*iters).gg1 = (*iters).gg0;
-	(*iters).hh1 = (*iters).hh0;
-	printf("%llu\n", words[15]);
-	ft_printf("START%llx %llx %llx %llx %llx %llx %llx %llx \n", (*iters).aa1, (*iters).bb1, (*iters).cc1, (*iters).dd1, (*iters).ee1,
-	(*iters).ff1, (*iters).gg1, (*iters).hh1);
-
-	count.i = 0;
-	while (count.i < 64)
-	{
-		//ft_printf("FFF%x %x %x %x %x %x %x %x \n", (*iters).a1, (*iters).b1, (*iters).c1, (*iters).d1, (*iters).e1, (*iters).f1,
-		//(*iters).f1, (*iters).h1);
-		add_vars.eps0 = sha512_cycle_shift((*iters).aa1, 28) ^ sha512_cycle_shift((*iters).aa1, 34) ^ sha512_cycle_shift((*iters).aa1, 39);
-        add_vars.ma = ((*iters).aa1 & (*iters).bb1) ^ ((*iters).aa1 & (*iters).cc1) ^ ((*iters).bb1 & (*iters).cc1);
-        add_vars.t2 = add_vars.eps0 + add_vars.ma;
-        add_vars.eps1 = sha512_cycle_shift((*iters).ee1, 14) ^ sha512_cycle_shift((*iters).ee1, 18) ^ sha512_cycle_shift((*iters).ee1, 41);
-        add_vars.ch = ((*iters).ee1 & (*iters).ff1) ^ ((~(*iters).ee1) & (*iters).gg1);
-        add_vars.t1 = (*iters).hh1 + add_vars.eps1 + add_vars.ch + square[count.i] + words[count.i];
-				//ft_printf("MMM%x %x %x %x %x %x %x %x \n", (*iters).a1, (*iters).b1, (*iters).c1, (*iters).d1, (*iters).e1, (*iters).f1,
-				//(*iters).f1, (*iters).h1);
-		(*iters).hh1 = (*iters).gg1;
-		(*iters).gg1 = (*iters).ff1;
-		(*iters).ff1 = (*iters).e1;
-		(*iters).ee1 = (*iters).dd1 + add_vars.t1;
-		(*iters).dd1 = (*iters).cc1;
-		(*iters).cc1 = (*iters).bb1;
-		(*iters).bb1 = (*iters).aa1;
-		(*iters).aa1 = add_vars.t1 + add_vars.t2;
-		ft_printf("EEE%llx %llx %llx %llx %llx %llx %llx %llx \n", (*iters).aa1, (*iters).bb1, (*iters).cc1, (*iters).dd1, (*iters).ee1,
-		(*iters).ff1, (*iters).gg1, (*iters).hh1);
-		count.i++;
-	}
-		(*iters).aa0 += (*iters).aa1;
-		(*iters).bb0 += (*iters).bb1;
-		(*iters).cc0 += (*iters).cc1;
-		(*iters).dd0 += (*iters).dd1;
-		(*iters).ee0 += (*iters).ee1;
-		(*iters).ff0 += (*iters).ff1;
-		(*iters).gg0 += (*iters).gg1;
-		(*iters).hh0 += (*iters).hh1;
-		//printf("START %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
-}
-
 void start_sha256(t_args *params, t_addition *iters, int iflast)
 {
 	t_addition				count;
@@ -690,15 +531,16 @@ void start_sha256(t_args *params, t_addition *iters, int iflast)
 
 	while (count.i < 16)
 	{
+		if ((count.k == 60 && (*params).md5_buf[count.k] == 0 && !iflast))
+		words[count.i] = (*params).bytes_read * 8;
+		else
 		words[count.i] = (((((*params).md5_buf[count.k++] << 24) & 4294967295) +
 			(((*params).md5_buf[count.k++] << 16) & 16777215)
 + (((*params).md5_buf[count.k++] << 8) & 65535) + ((*params).md5_buf[count.k++] & 255)));
-
+//printf("%u\n", words[count.i]);
 		count.i++;
 	}
-	if ((*params).md5_buf[63] == 0)
-	words[15] = (*params).bytes_read * 8;
-	printf("%u\n", words[15]);
+
 	while (count.i < 64)
 	{
 		sha_add_vars.s0 = sha256_cycle_shift(words[count.i-15], 7) ^ sha256_cycle_shift(words[count.i-15], 18)
@@ -715,8 +557,8 @@ sha_add_vars.s1 = sha256_cycle_shift(words[count.i-2], 17) ^ sha256_cycle_shift(
 	(*iters).f1 = (*iters).f0;
 	(*iters).g1 = (*iters).g0;
 	(*iters).h1 = (*iters).h0;
-	ft_printf("START%x %x %x %x %x %x %x %x \n", (*iters).a1, (*iters).b1, (*iters).c1, (*iters).d1, (*iters).e1, (*iters).f1,
-	(*iters).f1, (*iters).h1);
+	//ft_printf("START%x %x %x %x %x %x %x %x \n", (*iters).a1, (*iters).b1, (*iters).c1, (*iters).d1, (*iters).e1, (*iters).f1,
+	//(*iters).f1, (*iters).h1);
 
 	count.i = 0;
 	while (count.i < 64)
@@ -739,8 +581,8 @@ sha_add_vars.s1 = sha256_cycle_shift(words[count.i-2], 17) ^ sha256_cycle_shift(
 		(*iters).c1 = (*iters).b1;
 		(*iters).b1 = (*iters).a1;
 		(*iters).a1 = sha_add_vars.t1 + sha_add_vars.t2;
-		ft_printf("EEE%x %x %x %x %x %x %x %x \n", (*iters).a1, (*iters).b1, (*iters).c1, (*iters).d1, (*iters).e1, (*iters).f1,
-		(*iters).f1, (*iters).h1);
+		//ft_printf("EEE%x %x %x %x %x %x %x %x \n", (*iters).a1, (*iters).b1, (*iters).c1, (*iters).d1, (*iters).e1, (*iters).f1,
+		//(*iters).f1, (*iters).h1);
 		count.i++;
 	}
 		(*iters).a0 += (*iters).a1;
@@ -831,28 +673,17 @@ void add_padding_md5(t_args *params, int len, int count)
 	{
 		if (count != 0)
 		(*params).md5_buf[count++] = 128;
-   while (count < 64)
+   while (count < 63)
      (*params).md5_buf[count++] = 0;
  	if ((i * 8) <= 255)
    	(*params).md5_buf[63] = i * 8;
  	else
  			(*params).md5_buf[63] = 0;
 	}
-	if (ft_strcmp((*params).cipher, "sha512") == 0)
-	{
-		if (count != 0)
-		(*params).md5_buf[count++] = 128;
-   while (count < 128)
-     (*params).md5_buf[count++] = 0;
- 	if ((i * 8) <= 255)
-   	(*params).md5_buf[127] = i * 8;
- 	else
- 			(*params).md5_buf[127] = 0;
-	}
-  //printf("%s\n", (*params).md5_buf);
+  /*printf("%s\n", (*params).md5_buf);
   count = 0;
   while (count < len)
-    printf("%d\n", (*params).md5_buf[count++]);
+    printf("%d\n", (*params).md5_buf[count++]);*/
 }
 
 void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
@@ -861,12 +692,6 @@ void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
 	while (((*iters).k = read(fd, &params->md5_buf, len)) > 0)
 	{
 		(*params).bytes_read += (*iters).k;
-		/*if ((*params).md5_buf[(*iters).k - 1] == '\n')
-			{
-				(*params).md5_buf[(*iters).k - 1] = 0;
-				(*iters).k--;
-				(*params).bytes_read--;
-			}*/
 		/*if (find_symb((*params).flags, 'p', FLAG_LEN) >= 0)
 			ft_printf("%s", (*params).md5_buf);
 		else if (fd > 0 && find_symb((*params).flags, 'r', FLAG_LEN) < 0)
@@ -882,17 +707,10 @@ void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
 			else
 			start_sha256(params, iters, 0);
 		}
-		if (ft_strcmp((*params).cipher, "sha512") == 0)
-		{
-			if ((*iters).k == len)
-				start_sha512(params, iters, 1);
-			else
-			start_sha512(params, iters, 1);
-		}
 	}
 	if (ft_strcmp((*params).cipher, "md5") == 0)
 	{
-		if ((*iters).k == 0 && (*params).bytes_read % len == 0)
+		if ((*iters).k == 0 && (*params).bytes_read % 64 == 0)
 		{
 			add_padding_md5(params, len, (*params).bytes_read);
 			start_md5(params, iters);
@@ -902,7 +720,7 @@ void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
 	}
 	if (ft_strcmp((*params).cipher, "sha256") == 0)
 	{
-		if ((*iters).k == 0 && (*params).bytes_read % len == 0)
+		if ((*iters).k == 0 && (*params).bytes_read * 8 == 448)
 		{
 			add_padding_md5(params, len, (*params).bytes_read);
 			start_sha256(params, iters, 0);
@@ -910,17 +728,6 @@ void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
 		ft_printf("%x%x%x%x%x%x%x%x\n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0, (*iters).e0, (*iters).f0,
 		(*iters).f0, (*iters).h0);
 		init_sha256_vectors(iters);
-	}
-	if (ft_strcmp((*params).cipher, "sha512") == 0)
-	{
-		if ((*iters).k == 0 && (*params).bytes_read % len == 0)
-		{
-			add_padding_md5(params, len, (*params).bytes_read);
-			start_sha512(params, iters, 0);
-		}
-		ft_printf("%llx%llx%llx%llx%llx%llx%xll%llx\n", (*iters).aa0, (*iters).bb0, (*iters).cc0, (*iters).dd0, (*iters).ee0, (*iters).ff0,
-		(*iters).gg0, (*iters).hh0);
-		//init_sha512_vectors(iters);
 	}
 }
 
@@ -945,25 +752,6 @@ void init_sha256_vectors (t_addition *iters)
 	(*iters).h1 = 0;
 }
 
-void init_sha512_vectors (t_addition *iters)
-{
-	(*iters).aa0 = 0x6a09e667f3bcc908;
-	(*iters).bb0 = 0xbb67ae8584caa73b;
-	(*iters).cc0 = 0xbb67ae8584caa73b;
-	(*iters).dd0 = 0xa54ff53a5f1d36f1;
-	(*iters).ee0 = 0x510e527fade682d1;
-	(*iters).ff0 = 0x9b05688c2b3e6c1f;
-	(*iters).gg0 = 0x1f83d9abfb41bd6b;
-	(*iters).hh0 = 0x5be0cd19137e2179;
-	(*iters).aa1 = 0;
-	(*iters).bb1 = 0;
-	(*iters).cc1 = 0;
-	(*iters).dd1 = 0;
-	(*iters).ee1 = 0;
-	(*iters).ff1 = 0;
-	(*iters).gg1 = 0;
-	(*iters).hh1 = 0;
-}
 
 void init_md5_vectors (t_addition *iters)
 {
@@ -980,8 +768,10 @@ void init_md5_vectors (t_addition *iters)
 int main (int argc, char **argv)
 {
   t_addition				iters;
+
 	clear_iterators(&iters);
   t_args params;
+
   clear_struct(&params);
   if (!if_valid_args(argc, argv, &params))
     return (0);
@@ -989,28 +779,20 @@ int main (int argc, char **argv)
 		init_md5_vectors(&iters);
 	if (ft_strcmp(params.cipher, "sha256") == 0)
 		init_sha256_vectors(&iters);
-	if (ft_strcmp(params.cipher, "sha512") == 0)
-		init_sha512_vectors(&iters);
-	if ((ft_strcmp(params.cipher, "md5") == 0 || ft_strcmp(params.cipher, "sha256") == 0 || ft_strcmp(params.cipher, "sha512") == 0) && params.ifd > 1)
+	if ((ft_strcmp(params.cipher, "md5") == 0 || (ft_strcmp(params.cipher, "sha256") == 0)) && params.ifd > 1)
 	{
 		//printf("LETEST%s\n", "LETEST");
-		if (ft_strcmp(params.cipher, "sha512") == 0)
-			md5_reading(params.ifd, &params, 128, &iters);
-		else
-			md5_reading(params.ifd, &params, 64, &iters);
+		md5_reading(params.ifd, &params, 64, &iters);
 		/*print_md5_result(&iters, &params);
 		init_md5_vectors(&iters);*/
 	}
-  if ((ft_strcmp(params.cipher, "md5") == 0 || ft_strcmp(params.cipher, "sha256") == 0 || ft_strcmp(params.cipher, "sha512") == 0) && find_symb(params.flags, 's', FLAG_LEN) < 0)
+  if ((ft_strcmp(params.cipher, "md5") == 0 || (ft_strcmp(params.cipher, "sha256") == 0)) && find_symb(params.flags, 's', FLAG_LEN) < 0)
 	{
-		if (ft_strcmp(params.cipher, "sha512") == 0)
-		md5_reading(0, &params, 128, &iters);
-		else
 		md5_reading(0, &params, 64, &iters);
 		/*print_md5_result(&iters, &params);
 		init_md5_vectors(&iters);*/
 	}
-	if (((ft_strcmp(params.cipher, "md5") == 0 || ft_strcmp(params.cipher, "sha256") == 0 || ft_strcmp(params.cipher, "sha512") == 0)) && find_symb(params.flags, 's', FLAG_LEN) >= 0)
+	if ((ft_strcmp(params.cipher, "md5") == 0 || (ft_strcmp(params.cipher, "sha256") == 0)) && find_symb(params.flags, 's', FLAG_LEN) >= 0)
 	{
 		params.bytes_read = ft_strlen((char *)params.md5_str);
 		//printf("LE%d\n", params.bytes_read);

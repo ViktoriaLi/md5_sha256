@@ -1,5 +1,39 @@
 #include <stdio.h>
 
+unsigned long long sha512_cycle_shift(unsigned long long nbr, int count)
+{
+  int i = 0;
+  int j = 0;
+	unsigned long long tmp;
+	long long bits[32];
+	//printf("111%d\n", (*iters).a0);
+		tmp = nbr;
+  printf("UUU%llu\n", tmp);
+	while (i < count)
+	{
+		bits[i] = (1 << j) & tmp;
+    printf("UUU%llu\n", tmp);
+		j++;
+		i++;
+	}
+	tmp >>= count;
+	//tmp %= 4294967296;
+  printf("TTT%llu\n", tmp);
+	i = 0;
+	j = 64 - count;
+	while (i < count)
+	{
+		if (bits[i])
+	    tmp |= (1 << j);
+	  else
+	    tmp &= ~(1 << j);
+		i++;
+		j++;
+	}
+	return (tmp);
+		//printf("222%d\n", (*iters).a0);
+}
+
 unsigned int sha256_cycle_shift(unsigned int nbr, int count)
 {
   int i = 0;
@@ -87,10 +121,11 @@ int main(void)
   md5_cycle_shift(&test, 7);
   printf("%lu\n", test);*/
   //unsigned long test = 2636577670;
-  unsigned int test = 0x6A09E667;
-  printf("%u\n", sha256_cycle_shift(test, 7));
-  test = 3470005196;
-  printf("%d\n", test);
+  //2487416768280023388
+  unsigned long long test = 0x428a2f98d728ae22;
+  printf("%llu\n", sha512_cycle_shift(test, 7));
+  //test = 3470005196;
+  printf("%llu\n", test);
 
   //printf("%lx\n", (((test & 255) << 24) | ((test & 65535) << 8)) | (test >> 24));
 
@@ -115,3 +150,46 @@ printf("%lx\n", ((test>>24)&255) | // move byte 3 to byte 0
 01101010000010011110011001100111
  110101000001001111001100
  1     010101000001001111001100*/
+ /*void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
+ {
+ 	clear_iterators(iters);
+ 	while (((*iters).k = read(fd, &params->md5_buf, len)) > 0)
+ 	{
+ 		(*params).bytes_read += (*iters).k;
+ 		if ((*iters).k < len)
+ 			add_padding_md5(params, len, (*params).bytes_read);
+ 		if (ft_strcmp((*params).cipher, "md5") == 0)
+ 			start_md5(params, iters);
+ 		if (ft_strcmp((*params).cipher, "sha256") == 0)
+ 		{
+ 			if ((*iters).k == len)
+ 				start_sha256(params, iters, 1);
+ 			else
+ 			start_sha256(params, iters, 0);
+ 		}
+ 	}
+ 	if (ft_strcmp((*params).cipher, "md5") == 0)
+ 	{
+ 		if ((*iters).k == 0 && (*params).bytes_read % 64 == 0)
+ 		{
+ 			add_padding_md5(params, len, (*params).bytes_read);
+ 			start_md5(params, iters);
+ 		}
+ 		print_md5_result(iters, params);
+ 		init_md5_vectors(iters);
+ 	}
+ 	if (ft_strcmp((*params).cipher, "sha256") == 0)
+ 	{
+ 		if ((*iters).k == 0 && (*params).bytes_read % 64 == 0)
+ 		{
+ 			add_padding_md5(params, len, (*params).bytes_read);
+ 			start_sha256(params, iters, 0);
+ 		}
+ 		ft_printf("%x%x%x%x%x%x%x%x\n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0, (*iters).e0, (*iters).f0,
+ 		(*iters).f0, (*iters).h0);
+ 		init_sha256_vectors(iters);
+ 	}
+  count.j = 0;
+	while (count.j < 64)
+		(*params).md5_buf[count.j++] = 0;
+ }*/

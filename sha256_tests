@@ -1,0 +1,41 @@
+echo "Without flags"
+echo "pickle rick" | openssl sha256
+echo "pickle rick" | ./a.out sha256
+echo "Do not pity the dead, Harry." | openssl sha256
+echo "Do not pity the dead, Harry." | ./a.out sha256
+echo "Pity the living." | openssl sha256
+echo "Pity the living." | ./a.out sha256
+echo "And above all," | openssl sha256
+echo "And above all," | ./a.out sha256
+echo "pity those that aren't following baerista on spotify." | openssl sha256
+echo "pity those that aren't following baerista on spotify." | ./a.out sha256
+echo "be sure to handle edge cases carefully" | openssl sha256
+echo "be sure to handle edge cases carefully" | ./a.out sha256
+echo "some of this will not make sense at first" | openssl sha256
+echo "some of this will not make sense at first" | ./a.out sha256
+echo "but eventually you will understand" | openssl sha256
+echo "but eventually you will understand" | ./a.out sha256
+echo "GL HF let's go" | openssl sha256
+echo "GL HF let's go" | ./a.out sha256
+echo "one more thing" | openssl sha256
+echo "one more thing" | ./a.out sha256
+echo "just to be extra clear" | openssl sha256
+echo "just to be extra clear" | ./a.out sha256
+echo "abc" | openssl sha256
+echo "abc" | ./a.out sha256
+echo "https://www.youtube.com/watch?v=w-5yAtMtrSM" | openssl sha256
+echo "https://www.youtube.com/watch?v=w-5yAtMtrSM" | ./a.out sha256
+echo "wubba lubba dub dub" | openssl sha256
+echo "wubba lubba dub dub" | ./a.out sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnop" | openssl sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnop" | ./a.out sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" | openssl sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" | ./a.out sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyy" | openssl sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyy" | ./a.out sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwe" | openssl sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwe" | ./a.out sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqw" | openssl sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqw" | ./a.out sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwer" | openssl sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwer" | ./a.out sha256
