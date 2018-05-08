@@ -27,15 +27,36 @@ echo "https://www.youtube.com/watch?v=w-5yAtMtrSM" | openssl sha256
 echo "https://www.youtube.com/watch?v=w-5yAtMtrSM" | ./a.out sha256
 echo "wubba lubba dub dub" | openssl sha256
 echo "wubba lubba dub dub" | ./a.out sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnl" | openssl sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnl" | ./a.out sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlm" | openssl sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlm" | ./a.out sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmn" | openssl sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmn" | ./a.out sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmno" | openssl sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmno" | ./a.out sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnom" | openssl sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnom" | ./a.out sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomn" | openssl sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomn" | ./a.out sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomno" | openssl sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomno" | ./a.out sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnop" | openssl sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnop" | ./a.out sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopn" | openssl sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopn" | ./a.out sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopno" | openssl sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopno" | ./a.out sha256
+echo
 echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnop" | openssl sha256
 echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnop" | ./a.out sha256
 echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" | openssl sha256
 echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" | ./a.out sha256
 echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyy" | openssl sha256
 echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyy" | ./a.out sha256
-echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwe" | openssl sha256
-echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwe" | ./a.out sha256
 echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqw" | openssl sha256
 echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqw" | ./a.out sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwe" | openssl sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwe" | ./a.out sha256
 echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwer" | openssl sha256
 echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwer" | ./a.out sha256

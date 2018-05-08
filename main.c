@@ -46,7 +46,7 @@ void	make_short_blocks_md5(t_args *params, int ret, unsigned char *str, t_additi
 			(*params).md5_buf[count.j++] = str[count.i++];
 		//printf("%d\n", j);
 		if (count.j < len)
-			add_padding_md5(params, len, ret);
+			add_padding_md5(params, len, count.j);
 		if (ft_strcmp((*params).cipher, "md5") == 0)
 			start_md5(params, iters);
 		if (ft_strcmp((*params).cipher, "sha256") == 0)
@@ -69,7 +69,17 @@ void	make_short_blocks_md5(t_args *params, int ret, unsigned char *str, t_additi
 	}
 	if (ft_strcmp((*params).cipher, "sha256") == 0)
 	{
-		if (ret == 0 || ret % len == 0)
+		if (ret == 0)
+		{
+			add_padding_md5(params, len, ret);
+			start_sha256(params, iters, 0);
+		}
+		else if (ret * 8 == 448)
+		{
+			add_padding_md5(params, len, 0);
+			start_sha256(params, iters, 0);
+		}
+		else if ((*params).bytes_read % 64 == 0)
 		{
 			add_padding_md5(params, len, 0);
 			start_sha256(params, iters, 0);
@@ -78,6 +88,8 @@ void	make_short_blocks_md5(t_args *params, int ret, unsigned char *str, t_additi
 		(*iters).f0, (*iters).h0);
 		init_sha256_vectors(iters);
 	}
+	//if ((*iters).k == 0 && (*params).bytes_read % 64 == 0)
+
 	if (ft_strcmp((*params).cipher, "sha512") == 0)
 	{
 		if (ret == 0 || ret % len == 0)
@@ -85,13 +97,13 @@ void	make_short_blocks_md5(t_args *params, int ret, unsigned char *str, t_additi
 			add_padding_md5(params, len, 0);
 			start_sha512(params, iters, 0);
 		}
-		ft_printf("%llx%llx%llx%llx%llx%llx%llx%llx\n", (*iters).aa0, (*iters).bb0, (*iters).cc0, (*iters).dd0, (*iters).ee0, (*iters).ff0,
+		printf("%llx%llx%llx%llx%llx%llx%llx%llx\n", (*iters).aa0, (*iters).bb0, (*iters).cc0, (*iters).dd0, (*iters).ee0, (*iters).ff0,
 		(*iters).gg0, (*iters).hh0);
 		init_sha256_vectors(iters);
 	}
-	count.j = 0;
+	/*count.j = 0;
 	while (count.j < len)
-		(*params).md5_buf[count.j++] = 0;
+		(*params).md5_buf[count.j++] = 0;*/
 }
 
 void clear_iterators(t_addition *iters)
@@ -248,29 +260,9 @@ unsigned long long sha512_cycle_shift(unsigned long long nbr, int count)
 	unsigned long long bits[32];
 	//printf("111%d\n", (*iters).a0);
 	clear_iterators(&iters);
-
-		tmp = nbr;
-	while (iters.i < count)
-	{
-		bits[iters.i] = (1 << iters.j) & tmp;
-		iters.j++;
-		iters.i++;
-	}
-	tmp >>= count;
-	//tmp %= 4294967296;
-	iters.i = 0;
-	iters.j = 64 - count;
-	while (iters.i < count)
-	{
-		if (bits[iters.i])
-	    tmp |= (1 << iters.j);
-	  else
-	    tmp &= ~(1 << iters.j);
-		iters.i++;
-		iters.j++;
-	}
-	return (tmp);
-		//printf("222%d\n", (*iters).a0);
+	tmp = nbr;
+	nbr = (tmp >> count) | (tmp << (63 - count));
+	return (nbr);
 }
 
 unsigned int sha256_cycle_shift(unsigned int nbr, int count)
@@ -307,7 +299,7 @@ unsigned int sha256_cycle_shift(unsigned int nbr, int count)
 
 void md5_cycle_shift(t_addition *iters, int count, int rounds)
 {
-	unsigned long tmp;
+	unsigned int tmp;
 	int bits[32];
 	//printf("111%d\n", (*iters).a0);
 	clear_iterators(iters);
@@ -327,7 +319,6 @@ void md5_cycle_shift(t_addition *iters, int count, int rounds)
 		(*iters).i++;
 	}
 	tmp <<= count;
-	tmp %= 4294967296;
 	(*iters).i = 0;
 	(*iters).j = count - 1;
 	while ((*iters).j >= 0)
@@ -357,9 +348,9 @@ void round1_func(t_args *params, t_addition *iters, int i)
 	clear_iterators(&count);
 
 	unsigned char tmp1[4];
-	unsigned long tmp;
+	unsigned int tmp;
 
-	const unsigned long table[16] = {0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
+	const unsigned int table[16] = {0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
 		0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501, 0x698098d8, 0x8b44f7af,
 		0xffff5bb1, 0x895cd7be, 0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821};
 	const int s[16] = { 7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22 };
@@ -378,31 +369,30 @@ void round1_func(t_args *params, t_addition *iters, int i)
 			(((*iters).b0 & (*iters).c0) | (~(*iters).b0 & (*iters).d0)) + tmp + table[i]);
 			md5_cycle_shift(iters, s[i], 1);
 			(*iters).a0 += (*iters).b0;
-			(*iters).a0 %= 4294967296;
 			//printf("1ROUND %lu\n", (*iters).a0);
 		}
 	else if (i == 1 || i == 5 || i == 9 || i == 13)
 	{
 			(*iters).d0 = ((*iters).d0 +
-			(((*iters).a0 & (*iters).b0) | (~(*iters).a0 & (*iters).c0)) + tmp + table[i]) % 4294967296;
+			(((*iters).a0 & (*iters).b0) | (~(*iters).a0 & (*iters).c0)) + tmp + table[i]);
 			md5_cycle_shift(iters, s[i], 4);
-			(*iters).d0 = ((*iters).d0 + (*iters).a0) % 4294967296;
+			(*iters).d0 += (*iters).a0;
 			//printf("1ROUND %lu\n", (*iters).d0);
 	}
 	else if (i == 2 || i == 6 || i == 10 || i == 14)
 	{
 			(*iters).c0 = ((*iters).c0 +
-			(((*iters).d0 & (*iters).a0) | (~(*iters).d0 & (*iters).b0)) + tmp + table[i]) % 4294967296;
+			(((*iters).d0 & (*iters).a0) | (~(*iters).d0 & (*iters).b0)) + tmp + table[i]);
 			md5_cycle_shift(iters, s[i], 3);
-			(*iters).c0 = ((*iters).c0 + (*iters).d0) % 4294967296;
+			(*iters).c0 += (*iters).d0;
 			//printf("1ROUND %lu\n", (*iters).c0);
 	}
 	else if (i == 3 || i == 7 || i == 11 || i == 15)
 	{
 			(*iters).b0 = ((*iters).b0 +
-			(((*iters).c0 & (*iters).d0) | (~(*iters).c0 & (*iters).a0)) + tmp + table[i]) % 4294967296;
+			(((*iters).c0 & (*iters).d0) | (~(*iters).c0 & (*iters).a0)) + tmp + table[i]);
 			md5_cycle_shift(iters, s[i], 2);
-			(*iters).b0 = ((*iters).b0 + (*iters).c0) % 4294967296;
+			(*iters).b0 += (*iters).c0;
 			//printf("1ROUND %lu\n", (*iters).b0);
 	}
 }
@@ -413,8 +403,8 @@ void round2_func(t_args *params, t_addition *iters, int i)
 
 	clear_iterators(&count);
 	unsigned char tmp1[4];
-	unsigned long tmp;
-	const unsigned long table[16] = {0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa, 0xd62f105d, 0x02441453,
+	unsigned int tmp;
+	const unsigned int table[16] = {0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa, 0xd62f105d, 0x02441453,
 	0xd8a1e681, 0xe7d3fbc8, 0x21e1cde6, 0xc33707d6, 0xf4d50d87, 0x455a14ed,
 	0xa9e3e905, 0xfcefa3f8, 0x676f02d9, 0x8d2a4c8a};
 	const int s[16] = { 5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20 };
@@ -428,33 +418,33 @@ void round2_func(t_args *params, t_addition *iters, int i)
 	if (i == 0 || i == 4 || i == 8 || i == 12)
 	{
 			(*iters).a0 = ((*iters).a0 +
-			(((*iters).b0 & (*iters).d0) | ((*iters).c0 & ~(*iters).d0)) + tmp + table[i]) % 4294967296;
+			(((*iters).b0 & (*iters).d0) | ((*iters).c0 & ~(*iters).d0)) + tmp + table[i]);
 			md5_cycle_shift(iters, s[i], 1);
-			(*iters).a0 = ((*iters).a0 + (*iters).b0) % 4294967296;
+			(*iters).a0 += (*iters).b0;
 			//printf("2ROUND %lu\n", (*iters).a0);
 	}
 	else if (i == 1 || i == 5 || i == 9 || i == 13)
 	{
 			(*iters).d0 = ((*iters).d0 +
-			(((*iters).a0 & (*iters).c0) | ((*iters).b0 & ~(*iters).c0)) + tmp + table[i]) % 4294967296;
+			(((*iters).a0 & (*iters).c0) | ((*iters).b0 & ~(*iters).c0)) + tmp + table[i]);
 			md5_cycle_shift(iters, s[i], 4);
-			(*iters).d0 = ((*iters).d0 + (*iters).a0) % 4294967296;
+			(*iters).d0 += (*iters).a0;
 			//printf("2ROUND %lu\n", (*iters).d0);
 	}
 	else if (i == 2 || i == 6 || i == 10 || i == 14)
 	{
 			(*iters).c0 = ((*iters).c0 +
-			(((*iters).d0 & (*iters).b0) | ((*iters).a0 & ~(*iters).b0)) + tmp + table[i]) % 4294967296;
+			(((*iters).d0 & (*iters).b0) | ((*iters).a0 & ~(*iters).b0)) + tmp + table[i]);
 			md5_cycle_shift(iters, s[i], 3);
-			(*iters).c0 = ((*iters).c0 + (*iters).d0) % 4294967296;
+			(*iters).c0 += (*iters).d0;
 			//printf("2ROUND %lu\n", (*iters).c0);
 	}
 	else if (i == 3 || i == 7 || i == 11 || i == 15)
 	{
 			(*iters).b0 = ((*iters).b0 +
-			(((*iters).c0 & (*iters).a0) | ((*iters).d0 & ~(*iters).a0)) + tmp + table[i]) % 4294967296;
+			(((*iters).c0 & (*iters).a0) | ((*iters).d0 & ~(*iters).a0)) + tmp + table[i]);
 			md5_cycle_shift(iters, s[i], 2);
-			(*iters).b0 = ((*iters).b0 + (*iters).c0) % 4294967296;
+			(*iters).b0 += (*iters).c0;
 			//printf("2ROUND %lu\n", (*iters).b0);
 	}
 }
@@ -464,9 +454,9 @@ void round3_func(t_args *params, t_addition *iters, int i)
 	t_addition				count;
 
 	clear_iterators(&count);
-	unsigned long tmp;
+	unsigned int tmp;
 	unsigned char tmp1[4];
-	const unsigned long table[16] = {0xfffa3942, 0x8771f681,
+	const unsigned int table[16] = {0xfffa3942, 0x8771f681,
 	0x6d9d6122, 0xfde5380c, 0xa4beea44, 0x4bdecfa9, 0xf6bb4b60, 0xbebfbc70,
 	0x289b7ec6, 0xeaa127fa, 0xd4ef3085, 0x04881d05, 0xd9d4d039, 0xe6db99e5,
 	0x1fa27cf8, 0xc4ac5665};
@@ -481,33 +471,33 @@ void round3_func(t_args *params, t_addition *iters, int i)
 	if (i == 0 || i == 4 || i == 8 || i == 12)
 	{
 			(*iters).a0 = ((*iters).a0 +
-			((*iters).b0 ^ (*iters).c0 ^ (*iters).d0) + tmp + table[i]) % 4294967296;
+			((*iters).b0 ^ (*iters).c0 ^ (*iters).d0) + tmp + table[i]);
 			md5_cycle_shift(iters, s[i], 1);
-			(*iters).a0 = ((*iters).a0 + (*iters).b0) % 4294967296;
+			(*iters).a0 += (*iters).b0;
 			//printf("3ROUND %lu\n", (*iters).a0);
 	}
 	else if (i == 1 || i == 5 || i == 9 || i == 13)
 	{
 			(*iters).d0 = ((*iters).d0 +
-			((*iters).a0 ^ (*iters).b0 ^ (*iters).c0) + tmp + table[i]) % 4294967296;
+			((*iters).a0 ^ (*iters).b0 ^ (*iters).c0) + tmp + table[i]);
 			md5_cycle_shift(iters, s[i], 4);
-			(*iters).d0 = ((*iters).d0 + (*iters).a0) % 4294967296;
+			(*iters).d0 += (*iters).a0;
 			//printf("3ROUND %lu\n", (*iters).d0);
 	}
 	else if (i == 2 || i == 6 || i == 10 || i == 14)
 	{
 			(*iters).c0 = ((*iters).c0 +
-			((*iters).d0 ^ (*iters).a0 ^ (*iters).b0) + tmp + table[i]) % 4294967296;
+			((*iters).d0 ^ (*iters).a0 ^ (*iters).b0) + tmp + table[i]);
 			md5_cycle_shift(iters, s[i], 3);
-			(*iters).c0 = ((*iters).c0 + (*iters).d0) % 4294967296;
+			(*iters).c0 += (*iters).d0;
 			//printf("3ROUND %lu\n", (*iters).c0);
 	}
 	else if (i == 3 || i == 7 || i == 11 || i == 15)
 	{
 			(*iters).b0 = ((*iters).b0 +
-			((*iters).c0 ^ (*iters).d0 ^ (*iters).a0) + tmp + table[i]) % 4294967296;
+			((*iters).c0 ^ (*iters).d0 ^ (*iters).a0) + tmp + table[i]);
 			md5_cycle_shift(iters, s[i], 2);
-			(*iters).b0 = ((*iters).b0 + (*iters).c0) % 4294967296;
+			(*iters).b0 += (*iters).c0;
 			//printf("3ROUND %lu\n", (*iters).b0);
 	}
 }
@@ -517,9 +507,9 @@ void round4_func(t_args *params, t_addition *iters, int i)
 	t_addition				count;
 
 	clear_iterators(&count);
-	unsigned long tmp;
+	unsigned int tmp;
 	unsigned char tmp1[4];
-	const unsigned long table[16] =  {0xf4292244, 0x432aff97, 0xab9423a7, 0xfc93a039,
+	const unsigned int table[16] =  {0xf4292244, 0x432aff97, 0xab9423a7, 0xfc93a039,
 	0x655b59c3, 0x8f0ccc92, 0xffeff47d, 0x85845dd1, 0x6fa87e4f, 0xfe2ce6e0,
 	0xa3014314, 0x4e0811a1, 0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391};
 	const int s[16] = { 6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21 };
@@ -533,33 +523,33 @@ void round4_func(t_args *params, t_addition *iters, int i)
 	if (i == 0 || i == 4 || i == 8 || i == 12)
 	{
 			(*iters).a0 = ((*iters).a0 +
-			((*iters).c0 ^ ((*iters).b0 | ~(*iters).d0)) + tmp + table[i]) % 4294967296;
+			((*iters).c0 ^ ((*iters).b0 | ~(*iters).d0)) + tmp + table[i]);
 			md5_cycle_shift(iters, s[i], 1);
-			(*iters).a0 = ((*iters).a0 + (*iters).b0) % 4294967296;
+			(*iters).a0 += (*iters).b0;
 			//printf("4ROUND %lu\n", (*iters).a0);
 	}
 	else if (i == 1 || i == 5 || i == 9 || i == 13)
 	{
 			(*iters).d0 = ((*iters).d0 +
-			((*iters).b0 ^ ((*iters).a0 | ~(*iters).c0)) + tmp + table[i]) % 4294967296;
+			((*iters).b0 ^ ((*iters).a0 | ~(*iters).c0)) + tmp + table[i]);
 			md5_cycle_shift(iters, s[i], 4);
-			(*iters).d0 = ((*iters).d0 + (*iters).a0) % 4294967296;
+			(*iters).d0 += (*iters).a0;
 			//printf("4ROUND %lu\n", (*iters).d0);
 	}
 	else if (i == 2 || i == 6 || i == 10 || i == 14)
 	{
 			(*iters).c0 = ((*iters).c0 +
-			((*iters).a0 ^ ((*iters).d0 | ~(*iters).b0)) + tmp + table[i]) % 4294967296;
+			((*iters).a0 ^ ((*iters).d0 | ~(*iters).b0)) + tmp + table[i]);
 			md5_cycle_shift(iters, s[i], 3);
-			(*iters).c0 = ((*iters).c0 + (*iters).d0) % 4294967296;
+			(*iters).c0 += (*iters).d0;
 			//printf("4ROUND %lu\n", (*iters).c0);
 	}
 	else if (i == 3 || i == 7 || i == 11 || i == 15)
 	{
 			(*iters).b0 = ((*iters).b0 +
-			((*iters).d0 ^ ((*iters).c0 | ~(*iters).a0)) + tmp + table[i]) % 4294967296;
+			((*iters).d0 ^ ((*iters).c0 | ~(*iters).a0)) + tmp + table[i]);
 			md5_cycle_shift(iters, s[i], 2);
-			(*iters).b0 = ((*iters).b0 + (*iters).c0) % 4294967296;
+			(*iters).b0 += (*iters).c0;
 			//printf("4ROUND %lu\n", (*iters).b0);
 	}
 }
@@ -569,7 +559,7 @@ void start_sha512(t_args *params, t_addition *iters, int iflast)
 	t_addition				count;
 	t_sha512_vars				add_vars;
 	unsigned long tmp1;
-	unsigned long tmp2;
+	unsigned int tmp2;
 	const unsigned long long square[80] = {0x428a2f98d728ae22, 0x7137449123ef65cd,
 		0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc,
 0x3956c25bf348b538, 0x59f111f1b605d019, 0x923f82a4af194f9b, 0xab1c5ed5da6d8118,
@@ -655,7 +645,7 @@ add_vars.s1 = sha512_cycle_shift(words[count.i-2], 19) ^ sha512_cycle_shift(word
 		(*iters).cc1 = (*iters).bb1;
 		(*iters).bb1 = (*iters).aa1;
 		(*iters).aa1 = add_vars.t1 + add_vars.t2;
-		ft_printf("EEE%llx %llx %llx %llx %llx %llx %llx %llx \n", (*iters).aa1, (*iters).bb1, (*iters).cc1, (*iters).dd1, (*iters).ee1,
+		ft_printf("EEE %d %llx %llx %llx %llx %llx %llx %llx %llx \n", count.i, (*iters).aa1, (*iters).bb1, (*iters).cc1, (*iters).dd1, (*iters).ee1,
 		(*iters).ff1, (*iters).gg1, (*iters).hh1);
 		count.i++;
 	}
@@ -667,6 +657,7 @@ add_vars.s1 = sha512_cycle_shift(words[count.i-2], 19) ^ sha512_cycle_shift(word
 		(*iters).ff0 += (*iters).ff1;
 		(*iters).gg0 += (*iters).gg1;
 		(*iters).hh0 += (*iters).hh1;
+		printf("%s\n", "TEST1");
 		//printf("START %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
 }
 
@@ -686,19 +677,19 @@ void start_sha256(t_args *params, t_addition *iters, int iflast)
 
    unsigned int words[64];
 		clear_iterators(&count);
-
-
 	while (count.i < 16)
 	{
+		if ((*params).md5_buf[63] == 0 && count.i == 15 && !iflast)
+		words[count.i] = (*params).bytes_read * 8;
+		/*if ((*params).md5_buf[57] == 0 && count.i == 15 && !iflast)
+		words[count.i] = 0;*/
+		else
 		words[count.i] = (((((*params).md5_buf[count.k++] << 24) & 4294967295) +
 			(((*params).md5_buf[count.k++] << 16) & 16777215)
 + (((*params).md5_buf[count.k++] << 8) & 65535) + ((*params).md5_buf[count.k++] & 255)));
-
+		//printf("%u\n", words[count.i]);
 		count.i++;
 	}
-	if ((*params).md5_buf[63] == 0)
-	words[15] = (*params).bytes_read * 8;
-	printf("%u\n", words[15]);
 	while (count.i < 64)
 	{
 		sha_add_vars.s0 = sha256_cycle_shift(words[count.i-15], 7) ^ sha256_cycle_shift(words[count.i-15], 18)
@@ -715,8 +706,8 @@ sha_add_vars.s1 = sha256_cycle_shift(words[count.i-2], 17) ^ sha256_cycle_shift(
 	(*iters).f1 = (*iters).f0;
 	(*iters).g1 = (*iters).g0;
 	(*iters).h1 = (*iters).h0;
-	ft_printf("START%x %x %x %x %x %x %x %x \n", (*iters).a1, (*iters).b1, (*iters).c1, (*iters).d1, (*iters).e1, (*iters).f1,
-	(*iters).f1, (*iters).h1);
+	//ft_printf("START%x %x %x %x %x %x %x %x \n", (*iters).a1, (*iters).b1, (*iters).c1, (*iters).d1, (*iters).e1, (*iters).f1,
+	//(*iters).f1, (*iters).h1);
 
 	count.i = 0;
 	while (count.i < 64)
@@ -739,8 +730,8 @@ sha_add_vars.s1 = sha256_cycle_shift(words[count.i-2], 17) ^ sha256_cycle_shift(
 		(*iters).c1 = (*iters).b1;
 		(*iters).b1 = (*iters).a1;
 		(*iters).a1 = sha_add_vars.t1 + sha_add_vars.t2;
-		ft_printf("EEE%x %x %x %x %x %x %x %x \n", (*iters).a1, (*iters).b1, (*iters).c1, (*iters).d1, (*iters).e1, (*iters).f1,
-		(*iters).f1, (*iters).h1);
+		//ft_printf("EEE%x %x %x %x %x %x %x %x \n", (*iters).a1, (*iters).b1, (*iters).c1, (*iters).d1, (*iters).e1, (*iters).f1,
+		//(*iters).f1, (*iters).h1);
 		count.i++;
 	}
 		(*iters).a0 += (*iters).a1;
@@ -829,18 +820,25 @@ void add_padding_md5(t_args *params, int len, int count)
 	}
 	if (ft_strcmp((*params).cipher, "sha256") == 0)
 	{
-		if (count != 0)
+		//printf("1%d\n", count);
+		if (count != 0 || (count == 0 && ((*params).bytes_read % 64 == 0)))
+		//if (count < 56)
 		(*params).md5_buf[count++] = 128;
-   while (count < 64)
+   while (count < len)
      (*params).md5_buf[count++] = 0;
- 	if ((i * 8) <= 255)
-   	(*params).md5_buf[63] = i * 8;
+if (count < 56)
+{
+	if (((*params).bytes_read * 8) <= 255)
+   	(*params).md5_buf[63] = (*params).bytes_read * 8;
  	else
  			(*params).md5_buf[63] = 0;
-	}
+}
+
+}
+
 	if (ft_strcmp((*params).cipher, "sha512") == 0)
 	{
-		if (count != 0)
+		if (count != 0 && (*params).bytes_read % 64 != 0)
 		(*params).md5_buf[count++] = 128;
    while (count < 128)
      (*params).md5_buf[count++] = 0;
@@ -850,9 +848,9 @@ void add_padding_md5(t_args *params, int len, int count)
  			(*params).md5_buf[127] = 0;
 	}
   //printf("%s\n", (*params).md5_buf);
-  count = 0;
+  /*count = 0;
   while (count < len)
-    printf("%d\n", (*params).md5_buf[count++]);
+    printf("%d\n", (*params).md5_buf[count++]);*/
 }
 
 void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
@@ -861,6 +859,7 @@ void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
 	while (((*iters).k = read(fd, &params->md5_buf, len)) > 0)
 	{
 		(*params).bytes_read += (*iters).k;
+		//printf("DDD%d\n", (*iters).k);
 		/*if ((*params).md5_buf[(*iters).k - 1] == '\n')
 			{
 				(*params).md5_buf[(*iters).k - 1] = 0;
@@ -872,12 +871,12 @@ void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
 		else if (fd > 0 && find_symb((*params).flags, 'r', FLAG_LEN) < 0)
 			ft_printf("MD5 (%s) = ", (*params).filename);*/
 		if ((*iters).k < len)
-			add_padding_md5(params, len, (*params).bytes_read);
+			add_padding_md5(params, len, (*iters).k);
 		if (ft_strcmp((*params).cipher, "md5") == 0)
 			start_md5(params, iters);
 		if (ft_strcmp((*params).cipher, "sha256") == 0)
 		{
-			if ((*iters).k == len)
+			if ((*iters).k > 55)
 				start_sha256(params, iters, 1);
 			else
 			start_sha256(params, iters, 0);
@@ -887,7 +886,7 @@ void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
 			if ((*iters).k == len)
 				start_sha512(params, iters, 1);
 			else
-			start_sha512(params, iters, 1);
+			start_sha512(params, iters, 0);
 		}
 	}
 	if (ft_strcmp((*params).cipher, "md5") == 0)
@@ -900,15 +899,33 @@ void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
 		print_md5_result(iters, params);
 		init_md5_vectors(iters);
 	}
+	//if ((*iters).k == 0 && ((*params).bytes_read % 64 == 0 || ((*params).bytes_read * 8) % 64 == 0 ))
+
 	if (ft_strcmp((*params).cipher, "sha256") == 0)
 	{
-		if ((*iters).k == 0 && (*params).bytes_read % len == 0)
+		if ((*params).bytes_read % 64 == 0)
+		{
+			add_padding_md5(params, len, 0);
+			start_sha256(params, iters, 0);
+		}
+		if ((*params).bytes_read % 64 > 55)
+		{
+			add_padding_md5(params, len, 0);
+			start_sha256(params, iters, 0);
+		}
+		/*if ((*params).bytes_read > 55 && (*params).bytes_read < 64)
 		{
 			add_padding_md5(params, len, (*params).bytes_read);
 			start_sha256(params, iters, 0);
-		}
+		}*/
+		/*
+		if (((*params).bytes_read * 8 == 448))
+		{
+			add_padding_md5(params, len, 0);
+			start_sha256(params, iters, 0);
+		}*/
 		ft_printf("%x%x%x%x%x%x%x%x\n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0, (*iters).e0, (*iters).f0,
-		(*iters).f0, (*iters).h0);
+		(*iters).g0, (*iters).h0);
 		init_sha256_vectors(iters);
 	}
 	if (ft_strcmp((*params).cipher, "sha512") == 0)
@@ -918,9 +935,9 @@ void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
 			add_padding_md5(params, len, (*params).bytes_read);
 			start_sha512(params, iters, 0);
 		}
-		ft_printf("%llx%llx%llx%llx%llx%llx%xll%llx\n", (*iters).aa0, (*iters).bb0, (*iters).cc0, (*iters).dd0, (*iters).ee0, (*iters).ff0,
+		printf("%llx%llx%llx%llx%llx%llx%llx%llx\n", (*iters).aa0, (*iters).bb0, (*iters).cc0, (*iters).dd0, (*iters).ee0, (*iters).ff0,
 		(*iters).gg0, (*iters).hh0);
-		//init_sha512_vectors(iters);
+		init_sha512_vectors(iters);
 	}
 }
 
@@ -1040,4 +1057,5 @@ int main (int argc, char **argv)
     close(params.ifd);
   /*if (params.ofd > 1)
     close(params.ofd);*/
+		return (0);
 }

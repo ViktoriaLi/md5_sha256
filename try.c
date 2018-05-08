@@ -8,10 +8,10 @@ unsigned long long sha512_cycle_shift(unsigned long long nbr, int count)
 	long long bits[32];
 	//printf("111%d\n", (*iters).a0);
 		tmp = nbr;
-  printf("UUU%llu\n", tmp);
+  /*printf("UUU%llu\n", tmp);
 	while (i < count)
 	{
-		bits[i] = (1 << j) & tmp;
+		bits[i] = (((unsigned long long)1) << j) & tmp;
     printf("UUU%llu\n", tmp);
 		j++;
 		i++;
@@ -24,13 +24,14 @@ unsigned long long sha512_cycle_shift(unsigned long long nbr, int count)
 	while (i < count)
 	{
 		if (bits[i])
-	    tmp |= (1 << j);
+	    tmp |= (((unsigned long long)1) << j);
 	  else
-	    tmp &= ~(1 << j);
+	    tmp &= ~(((unsigned long long)1) << j);
 		i++;
 		j++;
-	}
-	return (tmp);
+	}*/
+  nbr = (tmp >> count) | (tmp << (63 - count));
+	return (nbr);
 		//printf("222%d\n", (*iters).a0);
 }
 
@@ -127,6 +128,22 @@ int main(void)
   //test = 3470005196;
   printf("%llu\n", test);
 
+  mdi = len(W) % 64
+    L = (len(W) << 3).to_bytes(8, 'big')        #Binary of len(W) in bits
+    npad = 55 - mdi if mdi < 56 else 119 - mdi  #Pad so 64 | len; add 1 block if needed
+    return bytes(W, 'ascii') + b'\x80' + (b'\x00' * npad) + L   #64 | 1 + npad + 8 + len(W)
+
+
+    def message_pad(bit_list):
+    pad_one = bit_list + '1'
+    pad_len = len(pad_one)
+    k=0
+    while ((pad_len+k)-448)%512 != 0:
+        k+=1
+    back_append_0 = '0'*k
+    back_append_1 = bin_64bit(len(bit_list))
+    return(pad_one+back_append_0+back_append_1)
+    
   //printf("%lx\n", (((test & 255) << 24) | ((test & 65535) << 8)) | (test >> 24));
 
   //printf("%lx\n", (((((test & 255) << 24) | ((test & 65535) << 8)) | ((test) >> 16)) | (test & 255) << 8 /*| ((test & 4294967295) >> 24*/));
