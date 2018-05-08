@@ -23,3 +23,42 @@ echo "just to be extra clear" | md5
 echo "just to be extra clear" | ./a.out md5
 echo "Do not pity the dead, Harry." | md5 -p
 echo "Do not pity the dead, Harry." | ./a.out md5 -p
+echo "https://www.youtube.com/watch?v=w-5yAtMtrSM" | md5
+echo "https://www.youtube.com/watch?v=w-5yAtMtrSM" | ./a.out md5
+echo "abc" | md5
+echo "abc" | ./a.out md5
+echo "wubba lubba dub dub" | md5
+echo "wubba lubba dub dub" | ./a.out md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnl" | md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnl" | ./a.out md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlm" | md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlm" | ./a.out md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmn" | md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmn" | ./a.out md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmno" | md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmno" | ./a.out md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnom" | md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnom" | ./a.out md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomn" | md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomn" | ./a.out md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomno" | md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomno" | ./a.out md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnop" | md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnop" | ./a.out md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopn" | md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopn" | ./a.out md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopno" | md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopno" | ./a.out md5
+echo
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnop" | md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnop" | ./a.out md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" | md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" | ./a.out md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyy" | md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyy" | ./a.out md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqw" | md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqw" | ./a.out md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwe" | md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwe" | ./a.out md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwer" | md5
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwer" | ./a.out md5
