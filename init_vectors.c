@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init_vectors.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vlikhotk <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/05/09 16:47:04 by vlikhotk          #+#    #+#             */
+/*   Updated: 2018/05/09 16:48:11 by vlikhotk         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "ft_ssl.h"
 
-void init_sha256_vectors (t_addition *iters)
+void	init_sha256_vectors(t_addition *iters)
 {
 	(*iters).a0 = 0x6A09E667;
 	(*iters).b0 = 0xBB67AE85;
@@ -20,7 +32,7 @@ void init_sha256_vectors (t_addition *iters)
 	(*iters).h1 = 0;
 }
 
-void init_sha512_vectors (t_addition *iters)
+void	init_sha512_vectors(t_addition *iters)
 {
 	(*iters).aa0 = 0x6a09e667f3bcc908;
 	(*iters).bb0 = 0xbb67ae8584caa73b;
@@ -40,7 +52,7 @@ void init_sha512_vectors (t_addition *iters)
 	(*iters).hh1 = 0;
 }
 
-void init_md5_vectors (t_addition *iters)
+void	init_md5_vectors(t_addition *iters)
 {
 	(*iters).a0 = 0x67452301;
 	(*iters).b0 = 0xEFCDAB89;
@@ -52,7 +64,7 @@ void init_md5_vectors (t_addition *iters)
 	(*iters).d1 = 0;
 }
 
-void clear_iterators(t_addition *iters)
+void	clear_iterators(t_addition *iters)
 {
 	(*iters).i = 0;
 	(*iters).j = 0;
@@ -60,11 +72,11 @@ void clear_iterators(t_addition *iters)
 	(*iters).m = 0;
 }
 
-void clear_struct(t_args *params)
+void	clear_struct(t_args *params)
 {
 	(*params).bytes_read = 0;
 	(*params).ifd = 0;
-  (*params).cipher = NULL;
-  (*params).md5_str = NULL;
+	(*params).cipher = NULL;
+	(*params).md5_str = NULL;
 	(*params).filename = NULL;
 }

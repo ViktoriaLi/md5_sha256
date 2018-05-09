@@ -12,9 +12,9 @@
 
 NAME = ft_ssl
 
-SFILES = main.c
+SFILES = main.c reading.c init_vectors.c md5.c sha256.c sha512.c printing.c
 
-OFILES = main.o
+OFILES = main.o reading.o init_vectors.o md5.o sha256.o sha512.o printing.o
 
 all: $(NAME)
 

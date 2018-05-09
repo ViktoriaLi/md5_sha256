@@ -135,9 +135,8 @@ typedef struct		s_sha512_vars
 }					t_sha512_vars;
 
 
-void	*ft_memalloc(size_t size);
-void	*ft_memcpy(void *dst, const void *src, size_t n);
 int		ft_strcmp(const char *s1, const char *s2);
+
 int		ft_printf(const char *format, ...);
 size_t		ft_strlen(const char *s);
 void clear_iterators(t_addition *iters);
@@ -157,6 +156,10 @@ void round2_func(t_args *params, t_addition *iters, int i, int iflast);
 void round3_func(t_args *params, t_addition *iters, int i, int iflast);
 void round4_func(t_args *params, t_addition *iters, int i, int iflast);
 void md5_cycle_shift(t_addition *iters, int count, int rounds);
+unsigned long long cycle_shift(unsigned long long nbr, int count, int len);
+void print_md5_result(t_addition *iters, t_args *params);
+void print_sha256_result(t_addition *iters, t_args *params);
+void print_sha512_result(t_addition *iters, t_args *params);
 
 void init_sha256_vectors (t_addition *iters);
 void start_sha256(t_args *params, t_addition *iters, int iflast);
