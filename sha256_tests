@@ -60,6 +60,8 @@ echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwe" | openssl
 echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwe" | ./a.out sha256
 echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwer" | openssl sha256
 echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwer" | ./a.out sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwerabcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwer" | openssl sha256
+echo "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwerabcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwer" | ./a.out sha256
 
 
 echo "With -s flag"
@@ -124,3 +126,5 @@ echo "3a419ab07dca9343f7564cc98e1ae398f9c6530cf4ddba9c1ee7db561c30febf"
 ./a.out sha256 -s "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqw"
 echo "8fb5f13113c0b22def16d1a4a6ec7ce199c514c34c031c78bc620eb592d7ebc1"
 ./a.out sha256 -s "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwe"
+echo "69b56b154db39286efaf21f6cfb8dc7811a877702a31de94bbf7e6de036393dc"
+./a.out sha256 -s "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqweabcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqyyyyqwe"

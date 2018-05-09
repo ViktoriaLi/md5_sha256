@@ -147,15 +147,15 @@ void flags_normalize(char *all_flags, t_args *params, int len);
 int check_md5_and_sha256_flags(int argc, char **argv, t_args *params);
 int if_valid_args(int argc, char **argv, t_args *params);
 void clear_struct(t_args *params);
-void start_md5(t_args *params, t_addition *iters);
+void start_md5(t_args *params, t_addition *iters, int iflast);
 void add_padding_md5(t_args *params, int len, int count);
 void	md5_reading(int fd, t_args *params, int len, t_addition *iters);
 void init_md5_vectors (t_addition *iters);
 
-void round1_func(t_args *params, t_addition *iters, int i);
-void round2_func(t_args *params, t_addition *iters, int i);
-void round3_func(t_args *params, t_addition *iters, int i);
-void round4_func(t_args *params, t_addition *iters, int i);
+void round1_func(t_args *params, t_addition *iters, int i, int iflast);
+void round2_func(t_args *params, t_addition *iters, int i, int iflast);
+void round3_func(t_args *params, t_addition *iters, int i, int iflast);
+void round4_func(t_args *params, t_addition *iters, int i, int iflast);
 void md5_cycle_shift(t_addition *iters, int count, int rounds);
 
 void init_sha256_vectors (t_addition *iters);
