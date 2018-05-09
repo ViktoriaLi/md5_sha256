@@ -36,7 +36,7 @@ void	init_sha512_vectors(t_addition *iters)
 {
 	(*iters).aa0 = 0x6a09e667f3bcc908;
 	(*iters).bb0 = 0xbb67ae8584caa73b;
-	(*iters).cc0 = 0xbb67ae8584caa73b;
+	(*iters).cc0 = 0x3c6ef372fe94f82b;
 	(*iters).dd0 = 0xa54ff53a5f1d36f1;
 	(*iters).ee0 = 0x510e527fade682d1;
 	(*iters).ff0 = 0x9b05688c2b3e6c1f;

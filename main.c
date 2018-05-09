@@ -13,6 +13,29 @@
 #include "ft_ssl.h"
 #include <stdio.h>
 
+size_t    ft_strlen(const char *s)
+{
+  size_t i;
+
+  i = 0;
+  while (s[i] != 0)
+    i++;
+  return (i);
+}
+
+
+int   ft_strcmp(const char *s1, const char *s2)
+{
+  int i;
+
+  i = 0;
+  while (s1[i] == s2[i] && s1[i] != 0 && s2[i] != 0)
+    i++;
+  if (s1[i] != s2[i])
+    return (int)((unsigned char)s1[i] - (unsigned char)s2[i]);
+  return (0);
+}
+
 int		find_symb(char *str, char flag, int len)
 {
 	int i;
@@ -70,7 +93,7 @@ int check_md5_and_sha256_flags(int argc, char **argv, t_args *params)
       }
 			else if (argv[i][1] == 's')
 			{
-				ft_printf("%s\n", "usage: md5 [-pqr] [-s string] [files ...]");
+				printf("%s\n", "usage: md5 [-pqr] [-s string] [files ...]");
 				return (1);
 			}
       j++;
@@ -83,7 +106,7 @@ int check_md5_and_sha256_flags(int argc, char **argv, t_args *params)
 		}
 		else
 		{
-			ft_printf("md5: %s: No such file or directory\n", argv[i]);
+			printf("md5: %s: No such file or directory\n", argv[i]);
 			return (1);
 		}
 			/*{
@@ -118,14 +141,14 @@ int if_valid_args(int argc, char **argv, t_args *params)
   res = 0;
   if (argc == 1)
   {
-    ft_printf("%s\n", "usage: ft_ssl command [command opts] [command args]");
+    printf("%s\n", "usage: ft_ssl command [command opts] [command args]");
     return (0);
   }
   if (ft_strcmp(argv[1], "md5") != 0 && ft_strcmp(argv[1], "sha256") != 0 && ft_strcmp(argv[1], "sha512") != 0)
   {
-    ft_printf("ft_ssl: Error: %s is an invalid command.\n\n", argv[1]);
-    ft_printf("%s\n", "Standard commands:\n\nMessage Digest commands:");
-    ft_printf("%s\n", "md5\nsha256\n\nCipher commands:\n");
+    printf("ft_ssl: Error: %s is an invalid command.\n\n", argv[1]);
+    printf("%s\n", "Standard commands:\n\nMessage Digest commands:");
+    printf("%s\n", "md5\nsha256\n\nCipher commands:\n");
     return (0);
   }
   if ((ft_strcmp(argv[1], "md5") == 0) && (res = check_md5_and_sha256_flags(argc, argv, params)) > 0)

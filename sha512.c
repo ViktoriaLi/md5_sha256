@@ -80,15 +80,14 @@ void start_sha512(t_args *params, t_addition *iters, int iflast)
 	(((((*params).md5_buf[count.k++] << 24) & 4294967295) +
 		(((*params).md5_buf[count.k++] << 16) & 16777215)
 	+ (((*params).md5_buf[count.k++] << 8) & 65535) + ((*params).md5_buf[count.k++] & 255)));
-			words[count.i] = (((unsigned long)tmp1) << 32) + (tmp2 & 4294967295);
+			words[count.i] = (((unsigned long long)tmp1) << 32) + (tmp2 & 4294967295);
 		}
-		printf("111%llu\n", words[count.i]);
 		count.i++;
 	}
 	while (count.i < 80)
 	{
-		add_vars.s0 = cycle_shift(words[count.i-15], 1, 63) ^ cycle_shift(words[count.i-15], 8, 63)	^ (words[count.i-15] >> 7);
-add_vars.s1 = cycle_shift(words[count.i-2], 19, 63) ^ cycle_shift(words[count.i-2], 61, 63) ^ (words[count.i-2] >> 6);
+		add_vars.s0 = cycle_shift(words[count.i-15], 1, 64) ^ cycle_shift(words[count.i-15], 8, 64)	^ (words[count.i-15] >> 7);
+		add_vars.s1 = cycle_shift(words[count.i-2], 19, 64) ^ cycle_shift(words[count.i-2], 61, 64) ^ (words[count.i-2] >> 6);
 		words[count.i] = words[count.i-16] + add_vars.s0 + words[count.i-7] + add_vars.s1;
 		count.i++;
 	}
@@ -105,14 +104,16 @@ add_vars.s1 = cycle_shift(words[count.i-2], 19, 63) ^ cycle_shift(words[count.i-
 	count.i = 0;
 	while (count.i < 80)
 	{
-		add_vars.eps0 = cycle_shift((*iters).aa1, 28, 63) ^ cycle_shift((*iters).aa1, 34, 63) ^ cycle_shift((*iters).aa1, 39, 63);
+		add_vars.eps0 = cycle_shift((*iters).aa1, 28, 64) ^ cycle_shift((*iters).aa1, 34, 64) ^ cycle_shift((*iters).aa1, 39, 64);
         add_vars.ma = ((*iters).aa1 & (*iters).bb1) ^ ((*iters).aa1 & (*iters).cc1) ^ ((*iters).bb1 & (*iters).cc1);
 				  //add_vars.ma = (((*iters).aa1 & (*iters).bb1) | ((*iters).cc1 & ((*iters).aa1 | (*iters).bb1)));
         add_vars.t2 = add_vars.eps0 + add_vars.ma;
-        add_vars.eps1 = cycle_shift((*iters).ee1, 14, 63) ^ cycle_shift((*iters).ee1, 18, 63) ^ cycle_shift((*iters).ee1, 41, 63);
+        add_vars.eps1 = cycle_shift((*iters).ee1, 14, 64) ^ cycle_shift((*iters).ee1, 18, 64) ^ cycle_shift((*iters).ee1, 41, 64);
         add_vars.ch = ((*iters).ee1 & (*iters).ff1) ^ ((~((*iters).ee1)) & (*iters).gg1);
 				//add_vars.ch = ((*iters).gg1 ^ ((*iters).ee1 & ((*iters).ff1 ^ (*iters).gg1)));
         add_vars.t1 = (*iters).hh1 + add_vars.eps1 + add_vars.ch + square[count.i] + words[count.i];
+		printf("EEE %d %llx %llx %llx %llx %llx %llx %llx %llx \n", count.i, (*iters).cc1, (*iters).bb1, (*iters).cc1, (*iters).dd1, (*iters).ee1,
+		(*iters).ff1, (*iters).gg1, (*iters).hh1);
 		(*iters).hh1 = (*iters).gg1;
 		(*iters).gg1 = (*iters).ff1;
 		(*iters).ff1 = (*iters).ee1;
@@ -122,8 +123,6 @@ add_vars.s1 = cycle_shift(words[count.i-2], 19, 63) ^ cycle_shift(words[count.i-
 		(*iters).bb1 = (*iters).aa1;
 		(*iters).aa1 = add_vars.t1 + add_vars.t2;
 
-		printf("EEE %d %llx %llx %llx %llx %llx %llx %llx %llx \n", count.i, (*iters).aa1, (*iters).bb1, (*iters).cc1, (*iters).dd1, (*iters).ee1,
-		(*iters).ff1, (*iters).gg1, (*iters).hh1);
 		count.i++;
 	}
 		(*iters).aa0 += (*iters).aa1;
