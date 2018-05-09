@@ -21,7 +21,7 @@
 
 typedef struct		s_args
 {
-	int bytes_read;
+	unsigned int bytes_read;
 	char	*cipher;
 	char	*filename;
 	unsigned char *md5_str;

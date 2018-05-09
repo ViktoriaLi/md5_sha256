@@ -52,3 +52,108 @@ sha256
 не работает на длине 56 и 60, 62, при флаге с - длина ставится в оба блока почему то для такой длины надо отправлять неласт
 в мд5 начиная с длины 55 некорректный вывод, наверное такая же проблема с паддингом
 echo "Do not pity the dead, Harry." | ./a.out md5 -s usage
+проверить чтоб на нулевых строках работало
+
+
+флаги
+без флагов - выводит только хеш
+с -р выводит ввод и хеш
+echo hello | md5 -p
+hello
+b1946ac92492d2347c6235b4d2611184
+
+echo hello | md5 -p -q
+hello
+b1946ac92492d2347c6235b4d2611184
+d41d8cd98f00b204e9800998ecf8427e
+
+echo hello | md5 -p -r
+hello
+b1946ac92492d2347c6235b4d2611184
+d41d8cd98f00b204e9800998ecf8427e
+
+echo hello | md5 -r -p -q
+hello
+b1946ac92492d2347c6235b4d2611184
+d41d8cd98f00b204e9800998ecf8427e
+
+md5 -s ""
+MD5 ("") = d41d8cd98f00b204e9800998ecf8427e
+
+md5 -s "" -r
+MD5 ("") = d41d8cd98f00b204e9800998ecf8427e
+
+md5 -r -s ""
+d41d8cd98f00b204e9800998ecf8427e ""
+
+md5 -r -s "" -q
+d41d8cd98f00b204e9800998ecf8427e ""
+
+md5 -r -q -s ""
+d41d8cd98f00b204e9800998ecf8427e
+
+echo hello | md5 -p -s ""
+hello
+b1946ac92492d2347c6235b4d2611184
+MD5 ("") = d41d8cd98f00b204e9800998ecf8427e
+
+echo hello | md5 -p -q -s ""
+hello
+b1946ac92492d2347c6235b4d2611184
+d41d8cd98f00b204e9800998ecf8427e
+
+echo hello | md5 -r -p -s ""
+hello
+b1946ac92492d2347c6235b4d2611184
+d41d8cd98f00b204e9800998ecf8427e ""
+
+echo hello | md5 -r -p -q -s ""
+hello
+b1946ac92492d2347c6235b4d2611184
+d41d8cd98f00b204e9800998ecf8427e
+
+echo hello | md5 -p
+hello
+b1946ac92492d2347c6235b4d2611184
+
+echo hello | md5 -p -q
+hello
+b1946ac92492d2347c6235b4d2611184
+d41d8cd98f00b204e9800998ecf8427e
+
+echo hello | md5 -p -q -r
+hello
+b1946ac92492d2347c6235b4d2611184
+d41d8cd98f00b204e9800998ecf8427e
+
+echo hello | md5 file
+MD5 (file) = 53d53ea94217b259c11a5a2d104ec58a
+
+echo hello | md5 -q file
+53d53ea94217b259c11a5a2d104ec58a
+
+echo hello | md5 -r file
+53d53ea94217b259c11a5a2d104ec58a file
+
+echo hello | md5 -p file
+hello
+b1946ac92492d2347c6235b4d2611184
+MD5 (file) = 53d53ea94217b259c11a5a2d104ec58a
+
+echo hello | md5 -p -s df file
+hello
+b1946ac92492d2347c6235b4d2611184
+MD5 ("df") = eff7d5dba32b4da32d9a67a519434d3f
+MD5 (file) = 53d53ea94217b259c11a5a2d104ec58a
+
+echo hello | md5 -p -r -s df file
+hello
+b1946ac92492d2347c6235b4d2611184
+eff7d5dba32b4da32d9a67a519434d3f "df"
+53d53ea94217b259c11a5a2d104ec58a file
+
+echo hello | md5 -p -q -s df file
+hello
+b1946ac92492d2347c6235b4d2611184
+eff7d5dba32b4da32d9a67a519434d3f
+53d53ea94217b259c11a5a2d104ec58a
