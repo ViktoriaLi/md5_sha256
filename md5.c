@@ -62,7 +62,7 @@ void round1_func(t_args *params, t_addition *iters, int i, int iflast)
 	else
 	tmp = (((((*params).md5_buf[count.k--] << 24) & 4294967295) + (((*params).md5_buf[count.k--] << 16) & 16777215)
 + (((*params).md5_buf[count.k--] << 8) & 65535) + ((*params).md5_buf[count.k] & 255)));
-	//printf("PLAINTEXT%lu\n", tmp);
+	//printf("PLAINTEXT%s\n", ((*params).md5_buf));
 	//printf("FFF%lu\n", (((*iters).b0 & (*iters).c0) | (~(*iters).b0 & (*iters).d0)));
 
 	if (i == 0 || i == 4 || i == 8 || i == 12)

@@ -1,0 +1,94 @@
+echo "abc" | md5
+echo "abc" | ./a.out md5
+echo "abc" | md5 -r
+echo "abc" | ./a.out md5 -r
+echo "abc" | md5 -q
+echo "abc" | ./a.out md5 -q
+echo "abc" | md5 -r -q
+echo "abc" | ./a.out md5 -r -q
+echo "abc" | md5 -s
+echo "abc" | ./a.out md5 -s
+echo "abc" | md5 -s tyu
+echo "abc" | ./a.out md5 -s tyu
+echo "abc" | md5 -r -s tyu
+echo "abc" | ./a.out md5 -r -s tyu
+echo "abc" | md5 -q -s tyu
+echo "abc" | ./a.out md5 -q -s tyu
+echo "abc" | md5 -r -q -s tyu
+echo "abc" | ./a.out md5 -r -q -s tyu
+echo "abc" | md5 file
+echo "abc" | ./a.out md5 file
+echo "abc" | md5 -r file
+echo "abc" | ./a.out md5 -r file
+echo "abc" | md5 -s file
+echo "abc" | ./a.out md5 -s file
+echo "abc" | md5 -q file
+echo "abc" | ./a.out md5 -q file
+echo "abc" | md5 -r -q file
+echo "abc" | ./a.out md5 -r -q file
+md5 -s
+./a.out md5 -s
+md5 -s tyu
+./a.out md5 -s tyu
+md5 -r -s tyu
+./a.out md5 -r -s tyu
+md5 -q -s tyu
+./a.out md5 -q -s tyu
+md5 -r -q -s tyu
+./a.out md5 -r -q -s tyu
+md5 file
+./a.out md5 file
+md5 -r file
+./a.out md5 -r file
+md5 -s file
+./a.out md5 -s file
+md5 -q file
+./a.out md5 -q file
+md5 -r -q file
+./a.out md5 -r -q file
+echo "abc" | md5 -s asd file
+echo "abc" | ./a.out md5 -s asd file
+echo "abc" | md5 -r -s asd file
+echo "abc" | ./a.out md5 -r -s asd file
+echo "abc" | md5 -q -s asd file
+echo "abc" | ./a.out md5 -q -s asd file
+echo "abc" | md5 -r -q -s asd file
+echo "abc" | ./a.out md5 -r -q -s asd file
+md5 -s asd file
+./a.out md5 -s asd file
+md5 -r -s asd file
+./a.out md5 -r -s asd file
+md5 -q -s asd file
+./a.out md5 -q -s asd file
+md5 -r -q -s asd file
+./a.out md5 -r -q -s asd file
+echo
+echo "abc" | md5 -p file
+echo "abc" | ./a.out md5 -p file
+echo "abc" | md5 -r -p file
+echo "abc" | ./a.out md5 -r -p file
+echo "abc" | md5 -q -p file
+echo "abc" | ./a.out md5 -q -p file
+echo "abc" | md5 -q -p -s fgh file
+echo "abc" | ./a.out md5 -q -p -s fgh file
+echo "abc" | md5 -p -q -s tyu
+echo "abc" | ./a.out md5 -p -q -s tyu
+md5 -p -q -s tyu
+./a.out md5 -p -q -s tyu
+md5 -p file
+./a.out md5 -p file
+md5 -r -p file
+./a.out md5 -r -p file
+md5 -q -p file
+./a.out md5 -q -p file
+md5 -q -p -s fgh file
+./a.out md5 -q -p -s fgh file
+
+md5
+./a.out md5
+md5 -r
+./a.out md5 -r
+md5 -q
+./a.out md5 -q
+md5 -r -q
+./a.out md5 -r -q

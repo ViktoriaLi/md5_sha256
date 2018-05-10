@@ -91,8 +91,8 @@ void start_sha512(t_args *params, t_addition *iters, int iflast)
 		words[count.i] = words[count.i-16] + add_vars.s0 + words[count.i-7] + add_vars.s1;
 		count.i++;
 	}
-	printf("START%llx %llx %llx %llx %llx %llx %llx %llx \n", (*iters).aa0, (*iters).bb0, (*iters).cc0, (*iters).dd0, (*iters).ee0,
-	(*iters).ff0, (*iters).gg0, (*iters).hh0);
+	//printf("START%llx %llx %llx %llx %llx %llx %llx %llx \n", (*iters).aa0, (*iters).bb0, (*iters).cc0, (*iters).dd0, (*iters).ee0,
+	//(*iters).ff0, (*iters).gg0, (*iters).hh0);
 	(*iters).aa1 = (*iters).aa0;
 	(*iters).bb1 = (*iters).bb0;
 	(*iters).cc1 = (*iters).cc0;
@@ -112,8 +112,8 @@ void start_sha512(t_args *params, t_addition *iters, int iflast)
         add_vars.ch = ((*iters).ee1 & (*iters).ff1) ^ ((~((*iters).ee1)) & (*iters).gg1);
 				//add_vars.ch = ((*iters).gg1 ^ ((*iters).ee1 & ((*iters).ff1 ^ (*iters).gg1)));
         add_vars.t1 = (*iters).hh1 + add_vars.eps1 + add_vars.ch + square[count.i] + words[count.i];
-		printf("EEE %d %llx %llx %llx %llx %llx %llx %llx %llx \n", count.i, (*iters).cc1, (*iters).bb1, (*iters).cc1, (*iters).dd1, (*iters).ee1,
-		(*iters).ff1, (*iters).gg1, (*iters).hh1);
+		//printf("EEE %d %llx %llx %llx %llx %llx %llx %llx %llx \n", count.i, (*iters).cc1, (*iters).bb1, (*iters).cc1, (*iters).dd1, (*iters).ee1,
+		//(*iters).ff1, (*iters).gg1, (*iters).hh1);
 		(*iters).hh1 = (*iters).gg1;
 		(*iters).gg1 = (*iters).ff1;
 		(*iters).ff1 = (*iters).ee1;

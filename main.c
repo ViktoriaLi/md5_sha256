@@ -92,7 +92,8 @@ int check_md5_and_sha256_flags(int argc, char **argv, t_args *params)
         i++;
       }
 			else if (argv[i][1] == 's')
-			{
+			{md5:
+        printf("%s: option requires an argument -- s\n", argv[1]);
 				printf("%s\n", "usage: md5 [-pqr] [-s string] [files ...]");
 				return (1);
 			}
@@ -102,35 +103,31 @@ int check_md5_and_sha256_flags(int argc, char **argv, t_args *params)
     else if (((*params).ifd = open(argv[i], O_RDONLY)) > 0)
 		{
 			(*params).filename = argv[i];
+      i++;
+      j = 0;
+      if (i < argc)
+      {
+        (*params).argvs = (char **)malloc(sizeof(char *) * (argc - i));
+        j = 0;
+        while (j < argc)
+      		(*params).argvs[j++] = NULL;
+          j = 0;
+        while (i < argc)
+        {
+          (*params).argvs[j] = argv[i];
+          //printf("%s\n", (*params).argvs[j]);
+          i++;
+          j++;
+        }
+        (*params).if_no_file = j;
+        (*params).argvs[j] = NULL;
+      }
 			break;
 		}
 		else
-		{
 			printf("md5: %s: No such file or directory\n", argv[i]);
-			return (1);
-		}
-			/*{
-				while (i < argc)
- 			 {
- 				 ft_printf("md5: %s %s\n", argv[i], "No such file or directory");
- 				 i++;
- 			 }
-			 break;
-		 }*/
-			/*printf("%s\n", argv[i]);
-			printf("%d\n", (*params).ifd);*/
-
-    //}
   }
   flags_normalize(all_flags, params, argc - 1);
-  //printf("DDD%d\n", find_flag(params, 'i'));
-  //printf("DDD%s\n", (*params).flags);
-  //printf("DDD%d\n", (*params).ifd);
-  /*if ((find_symb((*params).flags, 'i', FLAG_LEN)) >= 0 && (*params).ifd < 0)
-  {
-    ft_printf("%s\n", "base64: option requires an argument -- i");
-    return (1);
-  }*/
   return (0);
 }
 
@@ -163,10 +160,11 @@ int if_valid_args(int argc, char **argv, t_args *params)
 
 int main (int argc, char **argv)
 {
+  int i = 0;
   t_addition				iters;
 	clear_iterators(&iters);
   t_args params;
-  clear_struct(&params);
+  clear_struct(&params, argc);
   if (!if_valid_args(argc, argv, &params))
     return (0);
 	if (ft_strcmp(params.cipher, "md5") == 0)
@@ -175,34 +173,83 @@ int main (int argc, char **argv)
 		init_sha256_vectors(&iters);
 	if (ft_strcmp(params.cipher, "sha512") == 0)
 		init_sha512_vectors(&iters);
-	if ((ft_strcmp(params.cipher, "md5") == 0 || ft_strcmp(params.cipher, "sha256") == 0 || ft_strcmp(params.cipher, "sha512") == 0) && params.ifd > 1)
-	{
-		//printf("LETEST%s\n", "LETEST");
-		if (ft_strcmp(params.cipher, "sha512") == 0)
-			md5_reading(params.ifd, &params, 128, &iters);
-		else
-			md5_reading(params.ifd, &params, 64, &iters);
-		/*print_md5_result(&iters, &params);
-		init_md5_vectors(&iters);*/
-	}
-  if ((ft_strcmp(params.cipher, "md5") == 0 || ft_strcmp(params.cipher, "sha256") == 0 || ft_strcmp(params.cipher, "sha512") == 0) && find_symb(params.flags, 's', FLAG_LEN) < 0)
-	{
-		if (ft_strcmp(params.cipher, "sha512") == 0)
-		md5_reading(0, &params, 128, &iters);
-		else
-		md5_reading(0, &params, 64, &iters);
-		/*print_md5_result(&iters, &params);
-		init_md5_vectors(&iters);*/
-	}
-	if (((ft_strcmp(params.cipher, "md5") == 0 || ft_strcmp(params.cipher, "sha256") == 0 || ft_strcmp(params.cipher, "sha512") == 0)) && find_symb(params.flags, 's', FLAG_LEN) >= 0)
-	{
-		params.bytes_read = ft_strlen((char *)params.md5_str);
-		//printf("LE%d\n", params.bytes_read);
-		make_short_blocks_md5(&params, params.bytes_read, params.md5_str, &iters);
-		/*print_md5_result(&iters, &params);
-		init_md5_vectors(&iters);*/
-	}
+  if (((ft_strcmp(params.cipher, "md5") == 0 || ft_strcmp(params.cipher, "sha256") == 0 || ft_strcmp(params.cipher, "sha512") == 0)))
+{
+  if  (find_symb(params.flags, 'p', FLAG_LEN) >= 0)
+  {
+    //printf("%s\n", "INPUT");
+    i = 0;
+    while (i < 128)
+      params.md5_buf[i++] = 0;
+    params.bytes_read = 0;
+    if (ft_strcmp(params.cipher, "sha512") == 0)
+    md5_reading(0, &params, 128, &iters);
+    else
+    md5_reading(0, &params, 64, &iters);
+  }
+  if (ft_strcmp(params.cipher, "md5") == 0)
+    init_md5_vectors(&iters);
+  if (ft_strcmp(params.cipher, "sha256") == 0)
+    init_sha256_vectors(&iters);
+  if (ft_strcmp(params.cipher, "sha512") == 0)
+    init_sha512_vectors(&iters);
+    i = 0;
+    while (i < 128)
+      params.md5_buf[i++] = 0;
+    params.bytes_read = 0;
+    if (find_symb(params.flags, 's', FLAG_LEN) >= 0)
+    {
+      params.bytes_read = ft_strlen((char *)params.md5_str);
+      //printf("LE%d\n", params.bytes_read);
+      make_short_blocks_md5(&params, params.bytes_read, params.md5_str, &iters);
+    }
+
+    if (ft_strcmp(params.cipher, "md5") == 0)
+  		init_md5_vectors(&iters);
+  	if (ft_strcmp(params.cipher, "sha256") == 0)
+  		init_sha256_vectors(&iters);
+  	if (ft_strcmp(params.cipher, "sha512") == 0)
+  		init_sha512_vectors(&iters);
+    i = 0;
+    while (i < 128)
+      params.md5_buf[i++] = 0;
+    params.bytes_read = 0;
+    if (params.ifd > 1)
+    {
+      if (ft_strcmp(params.cipher, "sha512") == 0)
+        md5_reading(params.ifd, &params, 128, &iters);
+      else
+        md5_reading(params.ifd, &params, 64, &iters);
+    }
+    if (ft_strcmp(params.cipher, "md5") == 0)
+  		init_md5_vectors(&iters);
+  	if (ft_strcmp(params.cipher, "sha256") == 0)
+  		init_sha256_vectors(&iters);
+  	if (ft_strcmp(params.cipher, "sha512") == 0)
+  		init_sha512_vectors(&iters);
+      i = 0;
+      while (i < 128)
+        params.md5_buf[i++] = 0;
+      params.bytes_read = 0;
+    if  ((find_symb(params.flags, 's', FLAG_LEN) < 0 && params.ifd < 1) && find_symb(params.flags, 'p', FLAG_LEN) < 0)
+    {
+      //printf("%s\n", "INPUT");
+      if (ft_strcmp(params.cipher, "sha512") == 0)
+      md5_reading(0, &params, 128, &iters);
+      else
+      md5_reading(0, &params, 64, &iters);
+    }
+
+}
+i = 0;
+
+  while (i < params.if_no_file)
+  {
+    printf("md5: %s: No such file or directory\n", params.argvs[i]);
+    i++;
+  }
   if (params.ifd > 1)
     close(params.ifd);
 		return (0);
+
 }

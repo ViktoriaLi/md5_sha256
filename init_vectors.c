@@ -72,11 +72,13 @@ void	clear_iterators(t_addition *iters)
 	(*iters).m = 0;
 }
 
-void	clear_struct(t_args *params)
+void	clear_struct(t_args *params, int argc)
 {
 	(*params).bytes_read = 0;
 	(*params).ifd = 0;
+	(*params).if_no_file = 0;
 	(*params).cipher = NULL;
 	(*params).md5_str = NULL;
 	(*params).filename = NULL;
+	(*params).argvs = NULL;
 }

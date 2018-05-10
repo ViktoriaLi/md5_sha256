@@ -84,7 +84,7 @@ t_addition *iters)
 	}
 	last_block(params, iters);
 	if (ft_strcmp((*params).cipher, "md5") == 0)
-		print_md5_result(iters, params);
+		print_md5_result(iters, params, 1);
 	if (ft_strcmp((*params).cipher, "sha256") == 0)
 		print_sha256_result(iters, params);
 	if (ft_strcmp((*params).cipher, "sha512") == 0)
@@ -97,13 +97,21 @@ void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
 	while (((*iters).k = read(fd, &params->md5_buf, len)) > 0)
 	{
 		(*params).bytes_read += (*iters).k;
+		if (find_symb((*params).flags, 'p', FLAG_LEN) >= 0 && fd == 0)
+			printf("%s", (*params).md5_buf);
 		if ((*iters).k < len)
 			add_padding_md5(params, len, (*iters).k);
 		start_hashing(params, (*iters).k, iters);
 	}
 	last_block(params, iters);
 	if (ft_strcmp((*params).cipher, "md5") == 0)
-		print_md5_result(iters, params);
+	{
+		if (fd != 0)
+			print_md5_result(iters, params, 0);
+		else
+			print_md5_result(iters, params, 2);
+	}
+
 	if (ft_strcmp((*params).cipher, "sha256") == 0)
 		print_sha256_result(iters, params);
 	if (ft_strcmp((*params).cipher, "sha512") == 0)

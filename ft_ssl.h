@@ -26,6 +26,7 @@ typedef struct		s_args
 	char	*filename;
 	unsigned char *md5_str;
 	unsigned char md5_buf[128];
+	char **argvs;
 	//int if_full;
 	//int desad_count;
   //unsigned char b64_buf[65];
@@ -33,6 +34,7 @@ typedef struct		s_args
   //unsigned char *vector16;
 	char flags[FLAG_LEN];
 	int ifd;
+	int if_no_file;
 	//int ofd;
 	//unsigned char *des_key;
 	//unsigned char key_res48[6];
@@ -145,7 +147,7 @@ int		find_symb(char *str, char flag, int len);
 void flags_normalize(char *all_flags, t_args *params, int len);
 int check_md5_and_sha256_flags(int argc, char **argv, t_args *params);
 int if_valid_args(int argc, char **argv, t_args *params);
-void clear_struct(t_args *params);
+void clear_struct(t_args *params, int argc);
 void start_md5(t_args *params, t_addition *iters, int iflast);
 void add_padding_md5(t_args *params, int len, int count);
 void	md5_reading(int fd, t_args *params, int len, t_addition *iters);
@@ -157,7 +159,7 @@ void round3_func(t_args *params, t_addition *iters, int i, int iflast);
 void round4_func(t_args *params, t_addition *iters, int i, int iflast);
 void md5_cycle_shift(t_addition *iters, int count, int rounds);
 unsigned long long cycle_shift(unsigned long long nbr, int count, int len);
-void print_md5_result(t_addition *iters, t_args *params);
+void print_md5_result(t_addition *iters, t_args *params, int source);
 void print_sha256_result(t_addition *iters, t_args *params);
 void print_sha512_result(t_addition *iters, t_args *params);
 

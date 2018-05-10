@@ -30,8 +30,6 @@ dispatcher buu-rp function pointers
 16777215
 4294967295
 
--р оригинал ждет ввода
-
 The length of the original message in bytes is converted to its binary format of 64 bits. If overflow happens, only the low-order 64 bits are used.
 
 моя реализация не выводит 0 впереди, есди меньше 32 символов
@@ -41,19 +39,17 @@ The length of the original message in bytes is converted to its binary format of
 похоже что и в файле и с \чо читает только ри наличии флага р, иначе только из файла эчо - строка - файл
 перестало работать из файла
 
+если есть -р и файл - выведет хеш файла, если нет - хеш пустой строки
+md5 file отдельно работает
+md5 -р file ждет вводане работает ./a.out md5
+
 sha256
 01100001011000100110001110000000
 
-ша512 выдает аборт
 сделать лимит на плейнтекст  l < 2⁶⁴
-длина сообщения должна быть до 56 байт
-если месседж до 56 символов, то хватает места для длины и единицы.
-если равно 56-63 символам, то ставится единицы, а длина переносится на другой блок, где будет только длина
-не работает на длине 56 и 60, 62, при флаге с - длина ставится в оба блока почему то для такой длины надо отправлять неласт
-в мд5 начиная с длины 55 некорректный вывод, наверное такая же проблема с паддингом
+
 echo "Do not pity the dead, Harry." | ./a.out md5 -s usage
 проверить чтоб на нулевых строках работало
-
 
 флаги
 без флагов - выводит только хеш
@@ -157,3 +153,25 @@ hello
 b1946ac92492d2347c6235b4d2611184
 eff7d5dba32b4da32d9a67a519434d3f
 53d53ea94217b259c11a5a2d104ec58a
+
+
+echo "abc" | md5 -p file
+echo "abc" | ./a.out md5 -p file
+echo "abc" | md5 -r -p file
+echo "abc" | ./a.out md5 -r -p file
+echo "abc" | md5 -q -p file
+echo "abc" | ./a.out md5 -q -p file
+echo "abc" | md5 -q -p -s fgh file
+echo "abc" | ./a.out md5 -q -p -s fgh file
+echo "abc" | md5 -p -q -s tyu
+echo "abc" | ./a.out md5 -p -q -s tyu
+md5 -p -q -s tyu
+./a.out md5 -p -q -s tyu
+md5 -p file
+./a.out md5 -p file
+md5 -r -p file
+./a.out md5 -r -p file
+md5 -q -p file
+./a.out md5 -q -p file
+md5 -q -p -s fgh file
+./a.out md5 -q -p -s fgh file
