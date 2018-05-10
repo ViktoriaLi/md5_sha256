@@ -6,19 +6,14 @@
 /*   By: vlikhotk <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/09 18:12:22 by vlikhotk          #+#    #+#             */
-/*   Updated: 2018/05/09 18:25:49 by vlikhotk         ###   ########.fr       */
+/*   Updated: 2018/05/10 15:28:36 by vlikhotk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl.h"
 #include <stdio.h>
 
-unsigned long long	cycle_shift(unsigned long long nbr, int count, int len)
-{
-	return (nbr >> count) | (nbr << (len - count));
-}
-
-void				main_sha256_funcs(t_addition *iters, t_sha256 *sha_add_vars,
+void	main_sha256_funcs(t_addition *iters, t_sha256 *sha_add_vars,
 int i, unsigned int *words)
 {
 	const unsigned int square[64] = {0x428A2F98, 0x71374491, 0xB5C0FBCF,
@@ -47,31 +42,24 @@ int i, unsigned int *words)
 		+ square[i] + words[i];
 }
 
-void				start_sha256(t_args *params, t_addition *iters, int iflast)
+void	finish_words_addition(t_addition *iters)
 {
-	t_addition				count;
-	t_sha256				sha_add_vars;
-  unsigned int words[64];
+	(*iters).a0 += (*iters).a1;
+	(*iters).b0 += (*iters).b1;
+	(*iters).c0 += (*iters).c1;
+	(*iters).d0 += (*iters).d1;
+	(*iters).e0 += (*iters).e1;
+	(*iters).f0 += (*iters).f1;
+	(*iters).g0 += (*iters).g1;
+	(*iters).h0 += (*iters).h1;
+}
 
-	clear_iterators(&count);
-	while (count.i < 16)
-	{
-		if ((*params).md5_buf[63] == 0 && count.i == 15 && !iflast)
-		words[count.i] = (*params).bytes_read * 8;
-		else
-		words[count.i] = (((((*params).md5_buf[count.k++] << 24) & 4294967295) +
-			(((*params).md5_buf[count.k++] << 16) & 16777215)
-+ (((*params).md5_buf[count.k++] << 8) & 65535) + ((*params).md5_buf[count.k++] & 255)));
-		count.i++;
-	}
-	while (count.i < 64)
-	{
-		sha_add_vars.s0 = cycle_shift(words[count.i-15], 7, 32) ^ cycle_shift(words[count.i-15], 18, 32)
-		^ (words[count.i-15] >> 3);
-sha_add_vars.s1 = cycle_shift(words[count.i-2], 17, 32) ^ cycle_shift(words[count.i-2], 19, 32) ^ (words[count.i-2] >> 10);
-		words[count.i] = words[count.i-16] + sha_add_vars.s0 + words[count.i-7] + sha_add_vars.s1;
-		count.i++;
-	}
+void	main_256_cycle(t_addition *iters, unsigned int *words,
+t_sha256 *sha_add_vars)
+{
+	int i;
+
+	i = 0;
 	(*iters).a1 = (*iters).a0;
 	(*iters).b1 = (*iters).b0;
 	(*iters).c1 = (*iters).c0;
@@ -80,35 +68,54 @@ sha_add_vars.s1 = cycle_shift(words[count.i-2], 17, 32) ^ cycle_shift(words[coun
 	(*iters).f1 = (*iters).f0;
 	(*iters).g1 = (*iters).g0;
 	(*iters).h1 = (*iters).h0;
-	//ft_printf("START%x %x %x %x %x %x %x %x \n", (*iters).a1, (*iters).b1, (*iters).c1, (*iters).d1, (*iters).e1, (*iters).f1,
-	//(*iters).f1, (*iters).h1);
-
-	count.i = 0;
-	while (count.i < 64)
+	while (i < 64)
 	{
-		//ft_printf("FFF%x %x %x %x %x %x %x %x \n", (*iters).a1, (*iters).b1, (*iters).c1, (*iters).d1, (*iters).e1, (*iters).f1,
-		//(*iters).f1, (*iters).h1);
-    main_sha256_funcs(iters, &sha_add_vars, count.i, words);
-    (*iters).h1 = (*iters).g1;
-    (*iters).g1 = (*iters).f1;
-    (*iters).f1 = (*iters).e1;
-    (*iters).e1 = (*iters).d1 + sha_add_vars.t1;
-    (*iters).d1 = (*iters).c1;
-    (*iters).c1 = (*iters).b1;
-    (*iters).b1 = (*iters).a1;
-    (*iters).a1 = sha_add_vars.t1 + sha_add_vars.t2;
+		main_sha256_funcs(iters, sha_add_vars, i, words);
+		(*iters).h1 = (*iters).g1;
+		(*iters).g1 = (*iters).f1;
+		(*iters).f1 = (*iters).e1;
+		(*iters).e1 = (*iters).d1 + (*sha_add_vars).t1;
+		(*iters).d1 = (*iters).c1;
+		(*iters).c1 = (*iters).b1;
+		(*iters).b1 = (*iters).a1;
+		(*iters).a1 = (*sha_add_vars).t1 + (*sha_add_vars).t2;
+		i++;
+	}
+	finish_words_addition(iters);
+}
 
-		//ft_printf("EEE%x %x %x %x %x %x %x %x \n", (*iters).a1, (*iters).b1, (*iters).c1, (*iters).d1, (*iters).e1, (*iters).f1,
-		//(*iters).f1, (*iters).h1);
+void	fill_add_words_256(unsigned int *words, t_sha256 *sha_add_vars, int i)
+{
+	(*sha_add_vars).s0 = cycle_shift(words[i - 15], 7, 32) ^
+		cycle_shift(words[i - 15], 18, 32)
+	^ (words[i - 15] >> 3);
+	(*sha_add_vars).s1 = cycle_shift(words[i - 2], 17, 32) ^
+	cycle_shift(words[i - 2], 19, 32) ^ (words[i - 2] >> 10);
+}
+
+void	start_sha256(t_args *params, t_addition *iters, int iflast)
+{
+	t_addition		count;
+	t_sha256		sha_add_vars;
+	unsigned int	words[64];
+
+	clear_iterators(&count);
+	while (count.i < 16)
+	{
+		if ((*params).md5_buf[63] == 0 && count.i == 15 && !iflast)
+			words[count.i] = (*params).bytes_read * 8;
+		else
+			words[count.i] = ((((*params).md5_buf[count.k++] << 24) +
+			((*params).md5_buf[count.k++] << 16) + ((*params).md5_buf[count.k++]
+			<< 8) + (*params).md5_buf[count.k++]));
 		count.i++;
 	}
-		(*iters).a0 += (*iters).a1;
-		(*iters).b0 += (*iters).b1;
-		(*iters).c0 += (*iters).c1;
-		(*iters).d0 += (*iters).d1;
-		(*iters).e0 += (*iters).e1;
-		(*iters).f0 += (*iters).f1;
-		(*iters).g0 += (*iters).g1;
-		(*iters).h0 += (*iters).h1;
-		//printf("START %lu %lu %lu %lu \n", (*iters).a0, (*iters).b0, (*iters).c0, (*iters).d0);
+	while (count.i < 64)
+	{
+		fill_add_words_256(words, &sha_add_vars, count.i);
+		words[count.i] = words[count.i - 16] + sha_add_vars.s0 +
+		words[count.i - 7] + sha_add_vars.s1;
+		count.i++;
+	}
+	main_256_cycle(iters, words, &sha_add_vars);
 }

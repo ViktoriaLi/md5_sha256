@@ -153,25 +153,3 @@ hello
 b1946ac92492d2347c6235b4d2611184
 eff7d5dba32b4da32d9a67a519434d3f
 53d53ea94217b259c11a5a2d104ec58a
-
-
-echo "abc" | md5 -p file
-echo "abc" | ./a.out md5 -p file
-echo "abc" | md5 -r -p file
-echo "abc" | ./a.out md5 -r -p file
-echo "abc" | md5 -q -p file
-echo "abc" | ./a.out md5 -q -p file
-echo "abc" | md5 -q -p -s fgh file
-echo "abc" | ./a.out md5 -q -p -s fgh file
-echo "abc" | md5 -p -q -s tyu
-echo "abc" | ./a.out md5 -p -q -s tyu
-md5 -p -q -s tyu
-./a.out md5 -p -q -s tyu
-md5 -p file
-./a.out md5 -p file
-md5 -r -p file
-./a.out md5 -r -p file
-md5 -q -p file
-./a.out md5 -q -p file
-md5 -q -p -s fgh file
-./a.out md5 -q -p -s fgh file
