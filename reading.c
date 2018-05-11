@@ -6,12 +6,11 @@
 /*   By: vlikhotk <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/09 18:03:31 by vlikhotk          #+#    #+#             */
-/*   Updated: 2018/05/09 18:11:26 by vlikhotk         ###   ########.fr       */
+/*   Updated: 2018/05/11 15:51:40 by vlikhotk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl.h"
-#include <stdio.h>
 
 void	start_hashing(t_args *params, int count, t_addition *iters)
 {
@@ -37,8 +36,8 @@ void	start_hashing(t_args *params, int count, t_addition *iters)
 
 void	last_block(t_args *params, t_addition *iters)
 {
-	int	len;
-	int	limit;
+	unsigned int	len;
+	unsigned int	limit;
 
 	if (ft_strcmp((*params).cipher, "md5") == 0 ||
 		ft_strcmp((*params).cipher, "sha256") == 0)
@@ -86,34 +85,58 @@ t_addition *iters)
 	if (ft_strcmp((*params).cipher, "md5") == 0)
 		print_md5_result(iters, params, 1);
 	if (ft_strcmp((*params).cipher, "sha256") == 0)
-		print_sha256_result(iters, params);
+		print_sha256_result(iters, params, 1);
 	if (ft_strcmp((*params).cipher, "sha512") == 0)
-		print_sha512_result(iters, params);
+		print_sha512_result(iters, params, 1);
 }
 
 void	md5_reading(int fd, t_args *params, int len, t_addition *iters)
 {
+	int ind;
+
+	ind = 0;
 	clear_iterators(iters);
 	while (((*iters).k = read(fd, &params->md5_buf, len)) > 0)
 	{
 		(*params).bytes_read += (*iters).k;
 		if (find_symb((*params).flags, 'p', FLAG_LEN) >= 0 && fd == 0)
-			printf("%s", (*params).md5_buf);
+			ft_printf("%s", (*params).md5_buf);
 		if ((*iters).k < len)
 			add_padding_md5(params, len, (*iters).k);
 		start_hashing(params, (*iters).k, iters);
 	}
 	last_block(params, iters);
+	if (fd == 0)
+		ind = 2;
 	if (ft_strcmp((*params).cipher, "md5") == 0)
-	{
-		if (fd != 0)
-			print_md5_result(iters, params, 0);
-		else
-			print_md5_result(iters, params, 2);
-	}
-
+		print_md5_result(iters, params, ind);
 	if (ft_strcmp((*params).cipher, "sha256") == 0)
-		print_sha256_result(iters, params);
+		print_sha256_result(iters, params, ind);
 	if (ft_strcmp((*params).cipher, "sha512") == 0)
-		print_sha512_result(iters, params);
+		print_sha512_result(iters, params, ind);
+}
+
+void	reading_cases(t_args *params, t_addition *iters, int len)
+{
+	if (((ft_strcmp((*params).cipher, "md5") == 0 ||
+	ft_strcmp((*params).cipher, "sha256") == 0 ||
+	ft_strcmp((*params).cipher, "sha512") == 0)))
+	{
+		if (find_symb((*params).flags, 'p', FLAG_LEN) >= 0)
+			md5_reading(0, params, len, iters);
+		vectors_initiation(params, iters);
+		if (find_symb((*params).flags, 's', FLAG_LEN) >= 0)
+		{
+			(*params).bytes_read = ft_strlen((char *)(*params).md5_str);
+			make_short_blocks_md5(params,
+			(*params).bytes_read, (*params).md5_str, iters);
+		}
+		vectors_initiation(params, iters);
+		if ((*params).ifd > 1)
+			md5_reading((*params).ifd, params, len, iters);
+		vectors_initiation(params, iters);
+		if ((find_symb((*params).flags, 's', FLAG_LEN) < 0 &&
+		(*params).ifd < 1) && find_symb((*params).flags, 'p', FLAG_LEN) < 0)
+			md5_reading(0, params, len, iters);
+	}
 }

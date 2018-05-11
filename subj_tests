@@ -1,52 +1,52 @@
-echo "pickle rick" | ./a.out md5
+echo "pickle rick" | ./ft_ssl md5
 echo c5e433c1dbd7ba01e3763a9483e74b04
 
-echo "pickle rick" | ./a.out md5
+echo "pickle rick" | ./ft_ssl md5
 echo c5e433c1dbd7ba01e3763a9483e74b04
 
-echo "pickle rick" | ./a.out md5
+echo "pickle rick" | ./ft_ssl md5
 echo c5e433c1dbd7ba01e3763a9483e74b04
 
-echo "Do not pity the dead, Harry." | ./a.out md5 -p
+echo "Do not pity the dead, Harry." | ./ft_ssl md5 -p
 echo "Do not pity the dead, Harry."
 echo 2d95365bc44bf0a298e09a3ab7b34d2f
 
-echo "Pity the living." | ./a.out md5 -q -r
+echo "Pity the living." | ./ft_ssl md5 -q -r
 echo e20c3b973f63482a778f3fd1869b7f25
 
 echo "And above all," > file
-./a.out md5 file
+./ft_ssl md5 file
 
 echo "MD5 (file) = 53d53ea94217b259c11a5a2d104ec58a"
-./a.out md5 -r file
+./ft_ssl md5 -r file
 
 echo "53d53ea94217b259c11a5a2d104ec58a file"
 
-./a.out md5 -s "pity those that aren't following baerista on spotify."
+./ft_ssl md5 -s "pity those that aren't following baerista on spotify."
 
 echo "MD5 ('pity those that aren't following baerista on spotify.') = a3c990a1964705d9bf0e602f44572f5f"
 
-echo "be sure to handle edge cases carefully" | ./a.out md5 -p file
+echo "be sure to handle edge cases carefully" | ./ft_ssl md5 -p file
 
 echo "be sure to handle edge cases carefully"
 echo "3553dc7dc5963b583c056d1b9fa3349c"
 echo "MD5 (file) = 53d53ea94217b259c11a5a2d104ec58a"
 
-echo "some of this will not make sense at first" | ./a.out md5 file
+echo "some of this will not make sense at first" | ./ft_ssl md5 file
 echo "MD5 (file) = 53d53ea94217b259c11a5a2d104ec58a"
 
-echo "but eventually you will understand" | ./a.out md5 -p -r file
+echo "but eventually you will understand" | ./ft_ssl md5 -p -r file
 echo "but eventually you will understand"
 echo "dcdd84e0f635694d2a943fa8d3905281"
 echo "53d53ea94217b259c11a5a2d104ec58a file"
 
-echo "GL HF let's go" | ./a.out md5 -p -s "foo" file
+echo "GL HF let's go" | ./ft_ssl md5 -p -s "foo" file
 echo "GL HF lets go"
 echo "d1e3cc342b6da09480b27ec57ff243e2"
 echo "MD5 ('foo') = acbd18db4cc2f85cedef654fccc4a4d8"
 echo "MD5 (file) = 53d53ea94217b259c11a5a2d104ec58a"
 
-echo "one more thing" | ./a.out md5 -r -p -s "foo" file -s "bar"
+echo "one more thing" | ./ft_ssl md5 -r -p -s "foo" file -s "bar"
 echo "one more thing"
 echo "a0bd1876c6f011dd50fae52827f445f5"
 echo "acbd18db4cc2f85cedef654fccc4a4d8 "foo""
@@ -54,7 +54,7 @@ echo "53d53ea94217b259c11a5a2d104ec58a file"
 echo "ft_ssl: md5: -s: No such file or directory"
 echo "ft_ssl: md5: bar: No such file or directory"
 
-echo "just to be extra clear" | ./a.out md5 -r -q -p -s "foo" file
+echo "just to be extra clear" | ./ft_ssl md5 -r -q -p -s "foo" file
 echo "just to be extra clear"
 echo "3ba35f1ea0d170cb3b9a752e3360286c"
 echo "acbd18db4cc2f85cedef654fccc4a4d8"

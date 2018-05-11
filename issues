@@ -1,3 +1,4 @@
+
 Issues
 
 You will need to be able to input and output on STDIN/STDOUT and also
@@ -153,3 +154,9 @@ hello
 b1946ac92492d2347c6235b4d2611184
 eff7d5dba32b4da32d9a67a519434d3f
 53d53ea94217b259c11a5a2d104ec58a
+
+
+12345678
+87654321
+(*iters).aa0>>56 | (*iters).aa0>>48 | (*iters).aa0>>32 | (*iters).aa0<<56
+((*iters).aa0>>24) | (*iters).aa0>>24) | ((*iters).aa0<<8) | ((*iters).aa0>>8) | ((*iters).aa0<<24 | ((*iters).aa0<<32 | ((*iters).aa0<<48 | ((*iters).aa0<<56);

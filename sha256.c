@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "ft_ssl.h"
-#include <stdio.h>
 
 void	main_sha256_funcs(t_addition *iters, t_sha256 *sha_add_vars,
 int i, unsigned int *words)

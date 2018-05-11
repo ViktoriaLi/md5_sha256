@@ -72,7 +72,7 @@ void	clear_iterators(t_addition *iters)
 	(*iters).m = 0;
 }
 
-void	clear_struct(t_args *params, int argc)
+void	clear_struct(t_args *params)
 {
 	(*params).bytes_read = 0;
 	(*params).ifd = 0;

@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "ft_ssl.h"
-#include <stdio.h>
 
 void	main_sha512_funcs(t_addition *iters, t_sha512_vars *add_vars,
 unsigned long long *words, unsigned long long *square)

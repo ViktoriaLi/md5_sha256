@@ -25,14 +25,14 @@ void	round1_1_func(t_addition *iters, int i, int tmp)
 	{
 		(*iters).c0 += (((*iters).d0 & (*iters).a0) | (~(*iters).d0 &
 		(*iters).b0)) + tmp + table[i];
-		md5_cycle_shift(&iters->c0, s[i], 3, iters);
+		md5_cycle_shift(&iters->c0, s[i], iters);
 		(*iters).c0 += (*iters).d0;
 	}
 	if (i == 3 || i == 7 || i == 11 || i == 15)
 	{
 		(*iters).b0 += (((*iters).c0 & (*iters).d0) | (~(*iters).c0 &
 		(*iters).a0)) + tmp + table[i];
-		md5_cycle_shift(&iters->b0, s[i], 2, iters);
+		md5_cycle_shift(&iters->b0, s[i], iters);
 		(*iters).b0 += (*iters).c0;
 	}
 }
@@ -48,19 +48,19 @@ void	round1_func(t_args *params, t_addition *iters, int i, int iflast)
 	7, 12, 17, 22 };
 
 	(*iters).k = i * 4 + 3;
-	tmp = make_word_md5(i, params, iflast, iters);
+	tmp = make_word_md5(params, iflast, iters);
 	if (i == 0 || i == 4 || i == 8 || i == 12)
 	{
 		(*iters).a0 += (((*iters).b0 & (*iters).c0) | (~(*iters).b0 &
 		(*iters).d0)) + tmp + table[i];
-		md5_cycle_shift(&iters->a0, s[i], 1, iters);
+		md5_cycle_shift(&iters->a0, s[i], iters);
 		(*iters).a0 += (*iters).b0;
 	}
 	else if (i == 1 || i == 5 || i == 9 || i == 13)
 	{
 		(*iters).d0 += (((*iters).a0 & (*iters).b0) | (~(*iters).a0 &
 		(*iters).c0)) + tmp + table[i];
-		md5_cycle_shift(&iters->d0, s[i], 4, iters);
+		md5_cycle_shift(&iters->d0, s[i], iters);
 		(*iters).d0 += (*iters).a0;
 	}
 	round1_1_func(iters, i, tmp);
@@ -77,19 +77,19 @@ void	round2_func(t_args *params, t_addition *iters, int i, int iflast)
 	2, 7, 12};
 
 	(*iters).k = index[i] * 4 + 3;
-	tmp = make_word_md5(i, params, iflast, iters);
+	tmp = make_word_md5(params, iflast, iters);
 	if (i == 0 || i == 4 || i == 8 || i == 12)
 	{
 		(*iters).a0 += (((*iters).b0 & (*iters).d0) | ((*iters).c0 &
 		~(*iters).d0)) + tmp + table[i];
-		md5_cycle_shift(&iters->a0, s[i], 1, iters);
+		md5_cycle_shift(&iters->a0, s[i], iters);
 		(*iters).a0 += (*iters).b0;
 	}
 	else if (i == 1 || i == 5 || i == 9 || i == 13)
 	{
 		(*iters).d0 += (((*iters).a0 & (*iters).c0) | ((*iters).b0 &
 		~(*iters).c0)) + tmp + table[i];
-		md5_cycle_shift(&iters->d0, s[i], 4, iters);
+		md5_cycle_shift(&iters->d0, s[i], iters);
 		(*iters).d0 += (*iters).a0;
 	}
 	round2_1_func(iters, i, tmp);
