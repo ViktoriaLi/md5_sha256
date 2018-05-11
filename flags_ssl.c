@@ -42,6 +42,7 @@ void	flags_normalize(char *all_flags, t_args *params, int len)
 			(*params).flags[j] = all_flags[i];
 		i++;
 	}
+	//free(all_flags);
 }
 
 void	when_file_found(char **argv, t_args *params, int i, int argc)

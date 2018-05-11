@@ -83,6 +83,6 @@ int		main(int argc, char **argv)
 	}
 	if (params.ifd > 1)
 		close(params.ifd);
-	//ft_strdel(params.argvs);
+	//free(params.argvs);
 	return (0);
 }
