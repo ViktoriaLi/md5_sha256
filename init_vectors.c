@@ -80,5 +80,4 @@ void	clear_struct(t_args *params)
 	(*params).cipher = NULL;
 	(*params).md5_str = NULL;
 	(*params).filename = NULL;
-	(*params).argvs = NULL;
 }

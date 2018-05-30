@@ -6,7 +6,7 @@
 /*   By: vlikhotk <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/11 15:45:51 by vlikhotk          #+#    #+#             */
-/*   Updated: 2018/05/11 15:45:54 by vlikhotk         ###   ########.fr       */
+/*   Updated: 2018/05/13 15:46:25 by vlikhotk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,31 +42,14 @@ void	flags_normalize(char *all_flags, t_args *params, int len)
 			(*params).flags[j] = all_flags[i];
 		i++;
 	}
-	//free(all_flags);
+	free(all_flags);
 }
 
 void	when_file_found(char **argv, t_args *params, int i, int argc)
 {
-	int j;
-
-	j = 0;
 	(*params).filename = argv[i++];
 	if (i < argc)
-	{
-		(*params).argvs = (char **)malloc(sizeof(char *) * (argc - i));
-		j = 0;
-		while (j < argc)
-			(*params).argvs[j++] = NULL;
-		j = 0;
-		while (i < argc)
-		{
-			(*params).argvs[j] = argv[i];
-			i++;
-			j++;
-		}
-		(*params).if_no_file = j;
-		(*params).argvs[j] = NULL;
-	}
+		(*params).if_no_file = i;
 }
 
 int		save_ssl_flags(char **argv, t_addition *iters, t_args *params,
@@ -86,26 +69,25 @@ char **all_flags)
 	}
 	(*iters).j++;
 	(*iters).i++;
+	(*all_flags)[(*iters).j] = 0;
 	return (0);
 }
 
-int		check_md5_and_sha256_flags(int argc, char **argv, t_args *params,
+char	*check_md5_and_sha256_flags(int argc, char **argv, t_args *params,
 t_addition *iters)
 {
 	char		*all_flags;
 
 	(*iters).i = 2;
-	if (!(all_flags = (char *)malloc(argc - 1)))
-		return (1);
-	all_flags[argc - 1] = 0;
+	all_flags = ft_strnew(argc - 1);
 	while ((*iters).i < argc)
 	{
 		if (ft_strcmp(argv[(*iters).i], "-p") == 0 ||
-		ft_strcmp(argv[(*iters).i], "-q") == 0 || ft_strcmp(argv[(*iters).i], "-r")
-		== 0 || ft_strcmp(argv[(*iters).i], "-s") == 0)
+		ft_strcmp(argv[(*iters).i], "-q") == 0 || ft_strcmp(argv[(*iters).i],
+		"-r") == 0 || ft_strcmp(argv[(*iters).i], "-s") == 0)
 		{
 			if (save_ssl_flags(argv, iters, params, &all_flags))
-				return (1);
+				return (NULL);
 		}
 		else if (((*params).ifd = open(argv[(*iters).i], O_RDONLY)) > 0)
 		{
@@ -113,8 +95,10 @@ t_addition *iters)
 			break ;
 		}
 		else
+		{
 			ft_printf("md5: %s: No such file or directory\n", argv[(*iters).i]);
+			return (NULL);
+		}
 	}
-	flags_normalize(all_flags, params, argc - 1);
-	return (0);
+	return (all_flags);
 }

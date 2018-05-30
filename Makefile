@@ -12,31 +12,28 @@
 
 NAME = ft_ssl
 
-INC_DIR := ./includes/
-LIB_DIR := ./libft/
+LIB_DIR = ./libft/
 
-SFILES := main.c reading.c init_vectors.c md5.c sha256.c sha512.c printing.c \
+SFILES = main.c reading.c init_vectors.c md5.c sha256.c sha512.c printing.c \
  				 bits_shifting.c last_rounds_md5.c flags_ssl.c
 
-OFILES := main.o reading.o init_vectors.o md5.o sha256.o sha512.o printing.o \
+OFILES = main.o reading.o init_vectors.o md5.o sha256.o sha512.o printing.o \
 				 bits_shifting.o last_rounds_md5.o flags_ssl.o
 
 LIBFT = $(LIBFT_DIR)libftprintf.a
-LIBFT_DIR := $(LIB_DIR)
-LIBFT_INC := $(LIBFT_DIR)includes/
-LIBFT_FLAGS :=  -lft -L $(LIBFT_DIR)
+LIBFT_DIR = $(LIB_DIR)
+LIBFT_INC = $(LIBFT_DIR)includes/
 
-CC_FLAGS := -Wall -Wextra -Werror
-LINK_FLAGS := $(LIBFT_FLAGS)
-HEADER_FLAGS := -I $(INC_DIR)  -I $(LIBFT_INC)
+CC_FLAGS = -Wall -Wextra -Werror
+HEADER_FLAGS = -I $(LIBFT_INC)
 
-CC_FLAGS := -Wall -Wextra -Werror
-CC := gcc
+CC_FLAGS = -Wall -Wextra -Werror
+CC = gcc
 
 all: $(NAME)
 
 $(NAME): $(LIBFT) $(OFILES)
-	$(CC) $(OFILES) $(LINK_FLAGS) -o $(NAME) libftprintf.a
+	$(CC) $(OFILES) $(LIBFT) -o $(NAME)
 
 $(OFILES): %.o:%.c
 	$(CC) -c $< -o $@ $(CC_FLAGS) $(HEADER_FLAGS)

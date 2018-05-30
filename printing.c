@@ -12,58 +12,6 @@
 
 #include "ft_ssl.h"
 
-void	print_with_flags(int source, t_args *params, int place, char *cipher)
-{
-	if (place == 0)
-	{
-		if (source == 1 && find_symb((*params).flags, 's', FLAG_LEN) >= 0 &&
-			find_symb((*params).flags, 'q', FLAG_LEN) < 0 &&
-			find_symb((*params).flags, 'r', FLAG_LEN) < 0)
-			ft_printf("%s (\"%s\") = ", cipher, (*params).md5_str);
-		if (source == 0 && (*params).ifd > 0 &&
-			find_symb((*params).flags, 'q', FLAG_LEN)
-			< 0 && find_symb((*params).flags, 'r', FLAG_LEN) < 0)
-			ft_printf("%s (%s) = ", cipher, (*params).filename);
-	}
-	if (place == 1)
-	{
-		if (source == 0 && (*params).ifd > 0 &&
-			find_symb((*params).flags, 'r', FLAG_LEN)
-			>= 0 && find_symb((*params).flags, 'q', FLAG_LEN) < 0)
-			ft_printf(" %s\n", (*params).filename);
-		else if (source == 1 && find_symb((*params).flags, 's', FLAG_LEN)
-			>= 0 && find_symb((*params).flags, 'r', FLAG_LEN) >= 0 &&
-			find_symb((*params).flags, 'q', FLAG_LEN) < 0)
-			ft_printf(" \"%s\"\n", (*params).md5_str);
-		else
-			ft_printf("%c", '\n');
-	}
-}
-
-void	print_md5_result(t_addition *iters, t_args *params, int source)
-{
-	int				i;
-	unsigned int	x[4];
-	unsigned char	*y;
-
-	i = 0;
-	x[0] = (*iters).a0;
-	x[1] = (*iters).b0;
-	x[2] = (*iters).c0;
-	x[3] = (*iters).d0;
-	y = (unsigned char *)x;
-	print_with_flags(source, params, 0, "MD5");
-	while (i < 16)
-	{
-		if (y[i] < 16)
-			ft_printf("0%x", y[i]);
-		else
-			ft_printf("%x", y[i]);
-		i++;
-	}
-	print_with_flags(source, params, 1, "MD5");
-}
-
 void	make_little_endian_32(t_addition *iters, unsigned int *x)
 {
 	x[0] = (((*iters).a0 >> 24) & 255) | (((*iters).a0 << 8) & 16711680) |

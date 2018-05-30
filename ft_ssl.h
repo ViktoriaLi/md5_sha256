@@ -6,7 +6,7 @@
 /*   By: vlikhotk <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/22 13:15:59 by vlikhotk          #+#    #+#             */
-/*   Updated: 2018/05/10 17:06:11 by vlikhotk         ###   ########.fr       */
+/*   Updated: 2018/05/13 14:47:33 by vlikhotk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ typedef struct		s_args
 	char			*filename;
 	unsigned char	*md5_str;
 	unsigned char	md5_buf[128];
-	char			**argvs;
 	char			flags[FLAG_LEN];
 	int				ifd;
 	int				if_no_file;
@@ -108,9 +107,10 @@ void				make_short_blocks_md5(t_args *params, int ret,
 						t_addition *iters);
 int					find_symb(char *str, char flag, int len);
 void				flags_normalize(char *all_flags, t_args *params, int len);
-int					check_md5_and_sha256_flags(int argc, char **argv,
+char				*check_md5_and_sha256_flags(int argc, char **argv,
 						t_args *params, t_addition *iters);
-int					if_valid_args(int argc, char **argv, t_args *params, t_addition *iters);
+int					if_valid_args(int argc, char **argv, t_args *params,
+						t_addition *iters);
 void				clear_struct(t_args *params);
 void				start_md5(t_args *params, t_addition *iters, int iflast);
 void				add_padding_md5(t_args *params, int len, int count);
@@ -125,12 +125,15 @@ void				round3_func(t_args *params, t_addition *iters, int i,
 						int iflast);
 void				round4_func(t_args *params, t_addition *iters, int i,
 						int iflast);
-void				md5_cycle_shift(unsigned int *word, int rounds, t_addition *iters);
+void				md5_cycle_shift(unsigned int *word, int rounds,
+						t_addition *iters);
 unsigned long long	cycle_shift(unsigned long long nbr, int count, int len);
 void				print_md5_result(t_addition *iters, t_args *params,
 						int source);
-void				print_sha256_result(t_addition *iters, t_args *params, int source);
-void				print_sha512_result(t_addition *iters, t_args *params, int source);
+void				print_sha256_result(t_addition *iters, t_args *params,
+						int source);
+void				print_sha512_result(t_addition *iters, t_args *params,
+						int source);
 unsigned long long	made_words_for_sha512(t_args *params, t_addition *iters);
 void				init_sha256_vectors (t_addition *iters);
 void				start_sha256(t_args *params, t_addition *iters, int iflast);
@@ -140,12 +143,16 @@ void				round1_1_func(t_addition *iters, int i, int tmp);
 void				round2_1_func(t_addition *iters, int i, int tmp);
 void				round3_1_func(t_addition *iters, int i, int tmp);
 void				round4_1_func(t_addition *iters, int i, int tmp);
-unsigned int make_word_md5(t_args *params, int iflast, t_addition *iters);
-void	ft_strdel(char **as);
-void reading_cases(t_args *params, t_addition	*iters, int len);
-void vectors_initiation(t_args *params, t_addition	*iters);
-void	when_file_found(char **argv, t_args *params, int i, int argc);
-int		save_ssl_flags(char **argv, t_addition *iters, t_args *params,
-char **all_flags);
-
+unsigned int		make_word_md5(t_args *params, int iflast,
+						t_addition *iters);
+void				reading_cases(t_args *params, t_addition	*iters,
+						int len);
+void				vectors_initiation(t_args *params, t_addition	*iters);
+void				when_file_found(char **argv, t_args *params, int i,
+						int argc);
+int					save_ssl_flags(char **argv, t_addition *iters,
+						t_args *params, char **all_flags);
+void				print_with_flags(int source, t_args *params, int place,
+						char *cipher);
+char				*ft_strnew(size_t size);
 #endif
